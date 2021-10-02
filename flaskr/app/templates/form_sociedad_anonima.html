@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+{% block title %}Sociedad anonima{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+      <h1>Crear un Turno</h1>
+    </div>
+    <div class="card-body">
+      <form action="{{ url_for('nueva_sa_agregar') }}" method="POST" class="" enctype=multipart/form-data>
+        {{ form.csrf_token }}
+
+    
+        <div class="form-group row">
+          <label class='col-sm-2 col-form-label' for="nombreSociedad">Nombre de la Sociedad Anonima: </label>
+          <div class="col-sm-10">
+              <input class="form-control"  type="text" id="nombreSociedad" name="nombreSociedad">
+          </div>
+        </div>
+        
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="fechaCreacion">Fecha de creacion de la Sociedad Anonima: </label>
+            <div class="col-sm-10">
+                <input class="form-control" type="date" id="fechaCreacion" name="fechaCreacion">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="estatuto">Estatuto de conformación firmado por escribano público: </label>
+            <div class="col-sm-10">
+                <input class="form-control" type="file" accept=".docx,.odt,.pdf" id="estatuto" name="estatuto">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="domicilioLegal">Domicilio Legal: </label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="domicilioLegal" name="domicilioLegal">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="domicilioReal">Domicilio Real: </label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="domicilioReal" name="domicilioReal">
+            </div>
+        </div>
+        
+        
+    
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="email">Correo Electrónico (del apoderado): </label>
+            <div class="col-sm-10">
+                <input class="form-control" type="email" id="email" name="email">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="paisesExportacion">Países y estados a los que exporta </label>
+            <div class="col-sm-10">
+                <select  class="selectpicker" id="paisesExportacion" name="paisesExportacion">
+
+                </select>
+            </div>
+        </div>
+        <!-- Nombre de la Sociedad
+        ● Fecha de creación
+        ● Socios, de los cuales se registra Apellido, nombres y porcentaje de aportes realizados
+        (entre todos debe llegar al 100%)
+        ● Estatuto de conformación firmado por escribano público (Se adjunta un documento
+        .docx, odt, pdf).
+        ● Domicilio Legal
+        ● Domicilio Real
+        ● Representante Legal o Apoderado (Uno de los socios con mayor porcentaje. La
+        aplicación puede sugerir uno de los socios ingresados, permitiendo luego modificarlo)
+        ● Correo Electrónico (del apoderado)
+        ● Países y estados a los que exporta (En caso de no exportar el país será Argentina) -->
+
+    
+
+        <div class="col-md-6">
+            <button type="submit" class="btn btn-primary btn-block">Guardar</button>
+        </div>
+         
+      </form>
+
+
+    </div>
+  </div>
+
+{% endblock %}
+{% block scripts %}
+  <script src="{{url_for('static',filename='form_sociedad_anonima.js')}}"></script>
+  <script> 
+    setPaises();
+    $('select').selectpicker();
+  </script>
+{% endblock %}
