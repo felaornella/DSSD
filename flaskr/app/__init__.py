@@ -16,6 +16,7 @@ from flask import request
 from flask_bootstrap import Bootstrap
 from werkzeug.utils import secure_filename
 from flask_cors import CORS,cross_origin
+from app.resources import sociedad
 
 #va development
 def create_app(environment="development"):
