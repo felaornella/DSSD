@@ -16,7 +16,7 @@ def nuevaPag():
 url=http://localhost:8080/bonita
 login=walter.bates
 password=bpm
-processId= 1#anda a saber
+processId= 1#anda a saber pero hay que saberlo, si es dinamico se puede hacer un search a la api que devuelve el id
 
 def nueva():
     # log in
@@ -25,7 +25,12 @@ def nueva():
     print ('response from server:',res.text)
     dictFromServer = res.json()
     
+    nombreProc= "busquenme el nombre xq me parece que era re largo man"
+    res2 = requests.get(url+"/API/bpm/process?s="+nombreProc, json=dictToSend,headers={"X-Bonita-API-Token" : token})
+    
+    
     token = res #sacar el valor del token de la cookie aca
+    processId = res2["id"] #no se si necesita un indice mas
     dictToSend = {'username':'walter.bates', 'password':'bpm'} #vars que hay que enviar
     res = requests.post(url+"/API/bpm/process"+processId+"/instantation", json=dictToSend,headers={"X-Bonita-API-Token" : token})
 
