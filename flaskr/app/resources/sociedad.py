@@ -2,7 +2,16 @@ from flask import Response,jsonify, render_template
 import requests
 
 def nuevaPag():
-    return render_template("form_sociedad_anonima.html")
+    paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
+
+    nomPaises=[]
+
+    for each in paises:
+        nomPaises.append(each["name"])
+
+    nomPaises.sort()
+   
+    return render_template("form_sociedad_anonima.html",paises=nomPaises)
 
 def nueva():
     dictToSend = {'username':'walter.bates', 'password':'bpm'}

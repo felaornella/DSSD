@@ -8,7 +8,7 @@ from flask_session import Session
 from werkzeug.wrappers import ResponseStreamMixin
 from config import config
 from app import db
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from app.helpers import handler
 from app.helpers import auth as helper_auth
 from app.db_sqlalchemy import db_sqlalchemy
@@ -20,7 +20,7 @@ from app.resources import sociedad
 
 #va development
 def create_app(environment="development"):
-    load_dotenv()
+    #load_dotenv()
 
     # Configuración inicial de la app
     app = Flask(__name__)

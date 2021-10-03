@@ -6,11 +6,11 @@
 {% block content %}
 <div class="card">
     <div class="card-header">
-      <h1>Crear un Turno</h1>
+      <h1>Registre una S.A.</h1>
     </div>
     <div class="card-body">
       <form action="{{ url_for('nueva_sa_agregar') }}" method="POST" class="" enctype=multipart/form-data>
-        {{ form.csrf_token }}
+        
 
     
         <div class="form-group row">
@@ -59,8 +59,11 @@
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="paisesExportacion">Países y estados a los que exporta </label>
             <div class="col-sm-10">
-                <select  class="selectpicker" id="paisesExportacion" name="paisesExportacion">
-
+                <select multiple  class="selectpicker col-10" id="paisesExportacion" name="paisesExportacion">
+                  {% for each in paises %}
+                    {{each}}
+                    <option value="{{each}}"> {{each}} </option>
+                  {% endfor %}
                 </select>
             </div>
         </div>
@@ -82,8 +85,19 @@
         <div class="col-md-6">
             <button type="submit" class="btn btn-primary btn-block">Guardar</button>
         </div>
-         
+         <br>
       </form>
+      <div class="row" style="background-color: rgba(0,0,0,0.15); padding: 1rem; border-radius: .25rem;">
+        <div class="col-6">
+          <input class="form-control" type="text" placeholder="Nombre Socio" id="nombreSocioNuevo"><br>
+          <input class="form-control" type="text" placeholder="Apellido Socio" id="apellidoSocioNuevo"><br>
+          <input class="form-control" type="number" placeholder="Porcentaje Socio" id="porcentaje"><br>
+          <button class="btn btn-primary" id="buttonAddSocioNuevo">Agregar</button>
+        </div>
+        <div class="col-6" id="bloqueListado">
+          
+        </div>
+      </div>
 
 
     </div>
@@ -92,8 +106,4 @@
 {% endblock %}
 {% block scripts %}
   <script src="{{url_for('static',filename='form_sociedad_anonima.js')}}"></script>
-  <script> 
-    setPaises();
-    $('select').selectpicker();
-  </script>
 {% endblock %}

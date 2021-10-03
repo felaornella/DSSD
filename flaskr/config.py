@@ -1,5 +1,5 @@
 from os import environ
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 
 class BaseConfig(object):
     """Base configuration."""
@@ -11,7 +11,7 @@ class BaseConfig(object):
     DB_NAME = "db_name"
     SECRET_KEY = "secret"
 
-    load_dotenv()
+    #load_dotenv()
 
     @staticmethod
     def configure(app):
@@ -27,7 +27,7 @@ class DevelopmentConfig(BaseConfig):
     DB_HOST = environ.get("DB_HOST", "localhost")
     DB_USER = environ.get("DB_USER", "root")
     DB_PASS = environ.get("DB_PASS", "root")
-    DB_NAME = environ.get("DB_NAME", "canossiano")
+    DB_NAME = environ.get("DB_NAME", "dssd")
 
 class TestingConfig(BaseConfig):
     """Testing configuration."""
