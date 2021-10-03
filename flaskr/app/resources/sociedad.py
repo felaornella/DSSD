@@ -16,6 +16,7 @@ def nuevaPag():
 url=http://localhost:8080/bonita
 login=walter.bates
 password=bpm
+processId= 1#anda a saber
 
 def nueva():
     # log in
