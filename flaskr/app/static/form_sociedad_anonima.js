@@ -1,6 +1,12 @@
 var listadoSocios = $("#bloqueListado")
+var selectSocios = document.getElementById("apoderado")
+
 var sociosCount=0
 var porcentajeTot=0
+
+var sociosEnSelect=0
+
+var maxPerc = 0
 
 $("#buttonAddSocioNuevo").on("click",agregarSocio)
 
@@ -18,6 +24,20 @@ const Toast = Swal.mixin({
 
 
 function agregarSocio() {
+    if ($("#porcentaje").val().trim()==""|| ($("#apellidoSocioNuevo").val().trim()=="" || $("#nombreSocioNuevo").val().trim()=="")){
+        Toast.fire({
+            icon: 'warning',
+            title: "Datos incorrectos o faltantes"
+        })
+        return false
+    }
+    if (parseInt($("#porcentaje").val())<=0 || parseInt($("#porcentaje").val())>100){
+        Toast.fire({
+            icon: 'error',
+            title: "El porcentaje del socio debe estar entre 0% y 100%"
+        })
+        return false
+    }
     if (parseInt($("#porcentaje").val()) + porcentajeTot > 100){
         Toast.fire({
             icon: 'error',
@@ -29,7 +49,7 @@ function agregarSocio() {
     sociosCount=sociosCount+1
 
     var nombre = $("#apellidoSocioNuevo").val().trim() + ", " + $("#nombreSocioNuevo").val().trim()
-    var porcentaje = $("#porcentaje").val()
+    var porcentaje = parseInt($("#porcentaje").val())
 
     var socio = document.createElement("p")
     socio.innerText= nombre + " - " + porcentaje + "%"
@@ -62,6 +82,8 @@ function agregarSocio() {
 
     listadoSocios.prepend(socioEntero)
     
+    agregarASelect(nombre, porcentaje,socioEntero.getAttribute("id"))
+
     $("#buttonSocio"+sociosCount).on("click",()=>{quitar(socioEntero.getAttribute("id"))})
 
     $("#nombreSocioNuevo").val("")
@@ -69,6 +91,27 @@ function agregarSocio() {
     $("#porcentaje").val("")
 
     bloqueoCampos()
+}
+
+function agregarASelect(name, perc, id){
+    if (sociosEnSelect == 0){
+        $("#optionNoData").hide()
+        $("#apoderado").removeAttr("disabled")
+    }
+    sociosEnSelect +=1 
+
+    var op = document.createElement("option")
+    op.setAttribute("value",name)
+    op.innerText= name + " - " + perc
+    op.setAttribute("id", "select"+id)
+    op.setAttribute("perc",perc)
+
+    if (sociosEnSelect == 1 || parseInt(perc) > maxPerc){
+        op.setAttribute("selected",true)
+        maxPerc= parseInt(perc)
+    }
+
+    selectSocios.appendChild(op)
 }
 
 function bloqueoCampos(){
@@ -123,5 +166,38 @@ function setPaises() {
 function quitar(id){
     porcentajeTot = porcentajeTot - parseInt($("#"+id).attr("perc"))
     document.getElementById("bloqueListado").removeChild(document.getElementById(id))
+    quitarDeSelect("select"+id)
+    sociosCount-=1
+    console.log(id)
     bloqueoCampos()
+}
+
+function quitarDeSelect(id){
+    console.log(id)
+    percTemp=parseInt($("#"+id).attr("perc"))
+    document.getElementById("apoderado").removeChild(document.getElementById(id))
+    sociosEnSelect-=1
+    if (maxPerc == percTemp && sociosEnSelect>0){
+        maxPerc=0
+        idSelected=0
+        for (let i=1; i<document.getElementById("apoderado").children.length; i++){
+            if (parseInt(document.getElementById("apoderado").children[i].getAttribute("perc"))>maxPerc){
+                
+                console.log("entre")
+                maxPerc=parseInt(document.getElementById("apoderado").children[i].getAttribute("perc"))
+                idSelected=document.getElementById("apoderado").children[i].getAttribute("id")
+            }
+        }
+        //document.getElementById(idSelected).setAttribute("selected", true)
+        $("#apoderado").val($("#"+idSelected).val())
+    }
+
+    
+    
+    if (sociosEnSelect == 0){
+        $("#optionNoData").show()
+        $("#apoderado").attr("disabled",true)
+        $("#apoderado").val($("#optionNoData").val())
+    }
+
 }
