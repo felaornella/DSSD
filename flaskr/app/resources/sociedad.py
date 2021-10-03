@@ -13,33 +13,54 @@ def nuevaPag():
    
     return render_template("form_sociedad_anonima.html",paises=nomPaises)
 
+url=http://localhost:8080/bonita
+login=walter.bates
+password=bpm
+
 def nueva():
+    # log in
     dictToSend = {'username':'walter.bates', 'password':'bpm'}
-    res = requests.post('http://host:port/bonita/loginservice', json=dictToSend,headers={"Content-Type" : "application/x-www-form-urlencoded"})
+    res = requests.post(url+'loginservice', json=dictToSend,headers={"Content-Type" : "application/x-www-form-urlencoded"})
     print ('response from server:',res.text)
     dictFromServer = res.json()
+    
+    token = res #sacar el valor del token de la cookie aca
+    dictToSend = {'username':'walter.bates', 'password':'bpm'} #vars que hay que enviar
+    res = requests.post(url+"/API/bpm/process"+processId+"/instantation", json=dictToSend,headers={"X-Bonita-API-Token" : token})
 
-    # crear un case
-    data={"processDefinitionId":"5777042023671752656",
-        "variables":[
-            {
-            "name":"stringVariable",
-            "value":"aValue"
-            },
-            {
-            "name":"dateVariable",
-            "value":349246800000
-            },
-            {
-            "name":"numericVariable",
-            "value":5
-            }
-        ]
-    }
-    res = requests.post('http://host:port/API/bpm/case',data=data)
+    # # crear un case
+    # data={"processDefinitionId":"5777042023671752656",
+        # "variables":[
+            # {
+            # "name":"stringVariable",
+            # "value":"aValue"
+            # },
+            # {
+            # "name":"dateVariable",
+            # "value":349246800000
+            # },
+            # {
+            # "name":"numericVariable",
+            # "value":5
+            # }
+        # ]
+    # }
+    # res = requests.post('http://host:port/API/bpm/case',data=data)
 
     return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
 
+
+
+# def portal_login(url,username,password,disable_cert_validation):
+    # http = httplib2.Http(disable_ssl_certificate_validation=disable_cert_validation)
+    # API="/loginservice" 
+    # URL=url+API 
+    # body={'username': username, 'password': password, 'redirect': 'false'} 
+    # headers={"Content-type":"application/x-www-form-urlencoded"} 
+    # response, content = http.request(URL,'POST',headers=headers,body=urllib.urlencode(body)) 
+    # if response.status!=200: 
+      # raise Exception("HTTP STATUS: "+str(response.status)) 
+    # return response['set-cookie']
 
 # Authenticate to Bonita
 # To log in, use the following request:
