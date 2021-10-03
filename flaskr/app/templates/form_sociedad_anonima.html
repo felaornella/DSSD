@@ -88,17 +88,21 @@
          <br>
       </form>
       <div class="row" style="background-color: rgba(0,0,0,0.15); padding: 1rem; border-radius: .25rem;">
-        <div class="col-6">
+        <div class="col-4">
           <input class="form-control" type="text" placeholder="Nombre Socio" id="nombreSocioNuevo"><br>
           <input class="form-control" type="text" placeholder="Apellido Socio" id="apellidoSocioNuevo"><br>
           <input class="form-control" type="number" placeholder="Porcentaje Socio" id="porcentaje"><br>
           <button class="btn btn-primary" id="buttonAddSocioNuevo">Agregar</button>
         </div>
-        <div class="col-6" id="bloqueListado">
+        <div class="col-4" id="bloqueListado">
           
         </div>
+        <div class="col-4" id="selectApoderado">
+          <select class="form-control" id="apoderado" disabled>
+            <option value="-1" perc="-1" id="optionNoData">No hay datos para seleccionar</option>
+          </select>
+        </div>
       </div>
-
 
     </div>
   </div>
