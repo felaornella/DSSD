@@ -1,5 +1,6 @@
 from flask import Response,jsonify, render_template
 import requests
+import app.helpers.bonita as bonita
 
 def nuevaPag():
     paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
@@ -14,31 +15,16 @@ def nuevaPag():
     return render_template("form_sociedad_anonima.html",paises=nomPaises)
 
 def nueva():
-    dictToSend = {'username':'walter.bates', 'password':'bpm'}
-    res = requests.post('http://host:port/bonita/loginservice', json=dictToSend,headers={"Content-Type" : "application/x-www-form-urlencoded"})
-    print ('response from server:',res.text)
-    dictFromServer = res.json()
-
-    # crear un case
-    data={"processDefinitionId":"5777042023671752656",
-        "variables":[
-            {
-            "name":"stringVariable",
-            "value":"aValue"
-            },
-            {
-            "name":"dateVariable",
-            "value":349246800000
-            },
-            {
-            "name":"numericVariable",
-            "value":5
-            }
-        ]
-    }
-    res = requests.post('http://host:port/API/bpm/case',data=data)
-
+    bonita.autenticion()
+    idProc= bonita.getProcessId("DSSD - Proceso de Registro de SA")
+    caseId= bonita.initiateProcess(idProc)
+    bonita.setVariable(caseId,"email","email@gmail.comm","java.lang.String")
+    activityId= bonita.searchActivityByCase(caseId)
+    print(activityId)
+    bonita.assignTask(activityId,"4")
+    bonita.completeActivity(activityId)
     return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
+
 
 
 # Authenticate to Bonita

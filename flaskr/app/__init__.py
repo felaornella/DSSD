@@ -17,6 +17,7 @@ from flask_bootstrap import Bootstrap
 from werkzeug.utils import secure_filename
 from flask_cors import CORS,cross_origin
 from app.resources import sociedad
+import app.helpers.bonita as bonita 
 
 #va development
 def create_app(environment="development"):
@@ -55,7 +56,7 @@ def create_app(environment="development"):
 
     app.add_url_rule("/nueva", "nueva_sa", sociedad.nuevaPag,methods=["GET"])
     app.add_url_rule("/nueva", "nueva_sa_agregar", sociedad.nueva,methods=["POST"])
-
+    
     return app
 
 '''
