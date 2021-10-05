@@ -1,6 +1,8 @@
-from flask import Response,jsonify, render_template
+from flask import Response,jsonify, render_template, request
 import requests
 import app.helpers.bonita as bonita
+from app.models.sociedad import Sociedad
+from app.models.socio import Socio
 
 def nuevaPag():
     paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
@@ -15,10 +17,34 @@ def nuevaPag():
     return render_template("form_sociedad_anonima.html",paises=nomPaises)
 
 def nueva():
+    data= request.get_json(force=True)
+    
+    sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["emailApoderado"],data["paisesExportacion"])
+
+    print(data["socios"])
+
+    for each in data["socios"]:
+        soc = Socio(data["socios"][each]["nombre"],data["socios"][each]["apellido"],data["socios"][each]["porcentaje"],data["socios"][each]["apoderado"])
+        sociedad.socios.append(soc)
+
+    sociedad.save()
+    
+    return Response(status=200)
+
+def nueva2():
+    data= request.form
+
+    print(data)
+
     bonita.autenticion()
     idProc= bonita.getProcessId("DSSD - Proceso de Registro de SA")
     caseId= bonita.initiateProcess(idProc)
+
+
     bonita.setVariable(caseId,"email","email@gmail.comm","java.lang.String")
+    
+
+
     activityId= bonita.searchActivityByCase(caseId)
     print(activityId)
     bonita.assignTask(activityId,"4")

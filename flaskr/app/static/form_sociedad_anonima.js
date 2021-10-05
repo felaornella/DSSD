@@ -9,6 +9,7 @@ var sociosEnSelect=0
 var maxPerc = 0
 
 $("#buttonAddSocioNuevo").on("click",agregarSocio)
+$("#buttonEnviarForm").on("click",enviar)
 
 const Toast = Swal.mixin({
   toast: true,
@@ -76,7 +77,8 @@ function agregarSocio() {
     socioEntero.setAttribute("style","margin-bottom:1rem")
     socioEntero.setAttribute("id","socio"+sociosCount)
     socioEntero.setAttribute("perc",porcentaje)
-    socioEntero.setAttribute("name",nombre)
+    socioEntero.setAttribute("nombre",nombre)
+    socioEntero.setAttribute("apellido",$("#apellidoSocioNuevo").val().trim())
     socioEntero.appendChild(colSocio)
     socioEntero.appendChild(colButton)
 
@@ -101,7 +103,7 @@ function agregarASelect(name, perc, id){
     sociosEnSelect +=1 
 
     var op = document.createElement("option")
-    op.setAttribute("value",name)
+    op.setAttribute("value",id)
     op.innerText= name + " - " + perc
     op.setAttribute("id", "select"+id)
     op.setAttribute("perc",perc)
@@ -200,4 +202,63 @@ function quitarDeSelect(id){
         $("#apoderado").val($("#optionNoData").val())
     }
 
+}
+
+
+function enviar(){
+    var data2={}
+    data2['nombreSociedad']=$("#nombreSociedad").val().trim()
+    data2['fechaCreacion']=$("#fechaCreacion").val()
+    data2['domicilioLegal']=$("#domicilioLegal").val()
+    data2['domicilioReal']=$("#domicilioReal").val()
+    data2['emailApoderado']=$("#email").val()
+    
+    paisesStr=""
+    paises = $("#paisesExportacion").val()
+    for (let i=0; i<paises.length; i++){
+        if (i!=0){
+            paisesStr = paisesStr + "," + paises[i]
+        }else{
+            paisesStr = paises[i]
+        }
+    }
+    
+    data2["paisesExportacion"]=paisesStr
+
+    socios = document.getElementById("bloqueListado").children
+    sociosDic= {}
+    for (let i=0; i<socios.length; i++){
+        sociosDic["socio"+i]={
+            "nombre": socios[i].getAttribute("nombre"),
+            "apellido": socios[i].getAttribute("apellido"),
+            "porcentaje": socios[i].getAttribute("perc"),
+            "apoderado": $("#apoderado").val()==socios[i].getAttribute("id")
+        }
+    }
+
+    data2["socios"]=sociosDic
+
+    $.post({
+        url: "/nueva",
+        processData: false,
+        contentType: false,
+        datatType: "json",
+        data: JSON.stringify(data2),
+        success: function(response){
+            Swal.fire({
+              icon: 'success',
+              title:'Bien capo',
+              timer: 2000,
+            })
+        },
+        error: function(response) {
+          Swal.fire({
+            icon: 'error',
+            title: "La cague",
+            showConfirmButton: true,
+            timerProgressBar: true,
+            timer: 2500
+          })
+        }
+    })
 }

@@ -9,7 +9,7 @@
       <h1>Registre una S.A.</h1>
     </div>
     <div class="card-body">
-      <form action="{{ url_for('nueva_sa_agregar') }}" method="POST" class="" enctype=multipart/form-data>
+      <form>
         
 
     
@@ -80,29 +80,29 @@
         ● Correo Electrónico (del apoderado)
         ● Países y estados a los que exporta (En caso de no exportar el país será Argentina) -->
 
-    
-
-        <div class="col-md-6">
-            <button type="submit" class="btn btn-primary btn-block">Guardar</button>
+        <div class="row" style="background-color: rgba(0,0,0,0.15); padding: 1rem; border-radius: .25rem;">
+          <div class="col-4">
+            <input class="form-control" type="text" placeholder="Nombre Socio" id="nombreSocioNuevo"><br>
+            <input class="form-control" type="text" placeholder="Apellido Socio" id="apellidoSocioNuevo"><br>
+            <input class="form-control" type="number" placeholder="Porcentaje Socio" id="porcentaje"><br>
+            <button type="button" class="btn btn-primary" id="buttonAddSocioNuevo">Agregar</button>
+          </div>
+          <div class="col-4" id="bloqueListado">
+            
+          </div>
+          <div class="col-4" id="selectApoderado">
+            <select class="form-control" id="apoderado" disabled>
+              <option value="-1" perc="-1" id="optionNoData">No hay datos para seleccionar</option>
+            </select>
+          </div>
+        </div>
+        <br>
+        <div class="col-md-12">
+            <button type="button" id="buttonEnviarForm" class="btn btn-primary btn-block">Guardar</button>
         </div>
          <br>
       </form>
-      <div class="row" style="background-color: rgba(0,0,0,0.15); padding: 1rem; border-radius: .25rem;">
-        <div class="col-4">
-          <input class="form-control" type="text" placeholder="Nombre Socio" id="nombreSocioNuevo"><br>
-          <input class="form-control" type="text" placeholder="Apellido Socio" id="apellidoSocioNuevo"><br>
-          <input class="form-control" type="number" placeholder="Porcentaje Socio" id="porcentaje"><br>
-          <button class="btn btn-primary" id="buttonAddSocioNuevo">Agregar</button>
-        </div>
-        <div class="col-4" id="bloqueListado">
-          
-        </div>
-        <div class="col-4" id="selectApoderado">
-          <select class="form-control" id="apoderado" disabled>
-            <option value="-1" perc="-1" id="optionNoData">No hay datos para seleccionar</option>
-          </select>
-        </div>
-      </div>
+      
 
     </div>
   </div>
