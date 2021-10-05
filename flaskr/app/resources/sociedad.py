@@ -28,27 +28,23 @@ def nueva():
         sociedad.socios.append(soc)
 
     sociedad.save()
-    
+    print(sociedad.id)
+    guardarEnBonita(sociedad.id,sociedad.correoApoderado)
     return Response(status=200)
 
-def nueva2():
-    data= request.form
-
-    print(data)
-
-    bonita.autenticion()
+def guardarEnBonita(id,emailApoderado):
+    
+    bonita.autenticion('walter.bates','bpm')
     idProc= bonita.getProcessId("DSSD - Proceso de Registro de SA")
     caseId= bonita.initiateProcess(idProc)
 
-
-    bonita.setVariable(caseId,"email","email@gmail.comm","java.lang.String")
-    
-
+    bonita.setVariable(caseId,"emailApoderado",emailApoderado,"java.lang.String")
+    bonita.setVariable(caseId,"idSolicitud",id,"java.lang.String")
 
     activityId= bonita.searchActivityByCase(caseId)
-    print(activityId)
+    
     bonita.assignTask(activityId,"4")
-    bonita.completeActivity(activityId)
+    #bonita.completeActivity(activityId)
     return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
 
 

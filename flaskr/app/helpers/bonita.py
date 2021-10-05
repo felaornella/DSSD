@@ -1,7 +1,7 @@
 import requests
 from flask import session
-def autenticion():
-    body = {'username':'walter.bates', 'password':'bpm', 'redirect':'false'}
+def autenticion(usuario,contraseña):
+    body = {'username':usuario, 'password':contraseña, 'redirect':'false'}
   
     res = requests.post('http://localhost:8080/bonita/loginservice', data=body,headers={"Content-Type" : "application/x-www-form-urlencoded"})
     session["X-Bonita-API-Token"] = res.cookies.get('X-Bonita-API-Token')
