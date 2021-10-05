@@ -49,7 +49,8 @@ def create_app(environment="development"):
         conf["DB_USER"]+":"+conf["DB_PASS"]+"@" + \
         conf["DB_HOST"]+"/"+conf["DB_NAME"] + "?charset=utf8mb4"
     db_sqlalchemy.init_app(app)
-
+    db_sqlalchemy.app=app
+    db_sqlalchemy.create_all()
     # Configure secure_filename
     UPLOAD_FOLDER = 'static/uploads'
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

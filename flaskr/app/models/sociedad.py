@@ -4,8 +4,11 @@ from app.models.socio import Socio
 
 
 db = db_sqlalchemy
-metadata= db.MetaData()
 
+
+association_table = db.Table('sociedad_tiene_socios', 
+                                 db.Column('sociedad_id', db.Integer, db.ForeignKey('sociedad.id'), primary_key=True),
+                                 db.Column('socio_id', db.Integer, db.ForeignKey('socio.id'), primary_key=True))
 class Sociedad(db.Model):
     __tablename__ = 'sociedad'
     id = db.Column(db.Integer, primary_key=True)
@@ -17,13 +20,7 @@ class Sociedad(db.Model):
     correoApoderado = db.Column(db.String(255),nullable=True)
     paises = db.Column(db.Text(),nullable=True)
 
-    association_table = db.Table('sociedad_tiene_socios', metadata,
-                                 db.Column('sociedad_id', db.Integer, db.ForeignKey(id)),
-                                 db.Column('socio_id', db.Integer, db.ForeignKey(id)))
-    
-    socios = db.relationship("Socio", secondary=association_table,
-                                            primaryjoin=id==association_table.c.sociedad_id,
-                                            secondaryjoin=id==association_table.c.socio_id)
+    socios = db.relationship("Socio", secondary=association_table,lazy='subquery', backref=db.backref('sociedad', lazy=True))
                                             
 
     
