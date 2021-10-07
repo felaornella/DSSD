@@ -56,10 +56,15 @@ def create_app(environment="development"):
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
     app.add_url_rule("/login", "login_page", sociedad.loginPage,methods=["GET"])
+    app.add_url_rule("/logout", "logout", sociedad.logout,methods=["GET"])
     app.add_url_rule("/login", "login", sociedad.login,methods=["POST"])
     app.add_url_rule("/nueva", "nueva_sa", sociedad.nuevaPag,methods=["GET"])
     app.add_url_rule("/nueva", "nueva_sa_agregar", sociedad.nueva,methods=["POST"])
     app.add_url_rule("/menu_mesa_de_entrada", "menu_mesa_de_entrada", sociedad.menu_mesaEntrada,methods=["GET"])
+    app.add_url_rule("/menu_area_de_legales", "menu_area_de_legales", sociedad.menu_legales,methods=["GET"])
+    app.add_url_rule("/evaluar_solicitudes", "evaluar_solicitudes", sociedad.evaluar_solicitudes,methods=["GET"])
+     
+   
     return app
 
 '''

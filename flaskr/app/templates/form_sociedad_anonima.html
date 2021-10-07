@@ -4,7 +4,7 @@
   {{ super() }}
 {% endblock %}
 {% block content %}
-<div class="card" style="background-color: rgba(255,255,255,.5);">
+<div class="card container" style="background-color: rgba(255,255,255,.5);">
     <div class="card-header">
       <h1>Registre una S.A.</h1>
     </div>
@@ -87,14 +87,17 @@
             <input class="form-control" type="number" placeholder="Porcentaje Socio" id="porcentaje"><br>
             <button type="button" class="btn btn-primary" id="buttonAddSocioNuevo" style="width: 60%; margin-left: 20%; margin-right: 20%;">Agregar</button>
           </div>
-          <div class="col-4" id="bloqueListado">
-            
+          <div class="col-8" >
+            <div id="selectApoderado">
+              <select class="form-control" id="apoderado" disabled>
+                <option value="-1" perc="-1" id="optionNoData">No hay datos para seleccionar</option>
+              </select>
+            </div>
+            <div id="bloqueListado" style="margin-top: 1rem; overflow-y: auto; overflow-x: hidden; max-height: 15rem;">
+
+            </div>
           </div>
-          <div class="col-4" id="selectApoderado">
-            <select class="form-control" id="apoderado" disabled>
-              <option value="-1" perc="-1" id="optionNoData">No hay datos para seleccionar</option>
-            </select>
-          </div>
+          
         </div>
         <br>
         <div class="col-md-12">

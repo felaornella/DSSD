@@ -1,4 +1,4 @@
-from flask import Response,jsonify, render_template, request
+from flask import Response,jsonify, render_template, request, session, url_for, flash
 import requests
 from werkzeug.utils import redirect
 import app.helpers.bonita as bonita
@@ -50,21 +50,81 @@ def guardarEnBonita(id,emailApoderado):
 
 
 def loginPage():
+    if ("tipo_user" in session):
+        if session["tipo_user"]==1:
+            return redirect(url_for("menu_mesa_de_entrada"))
+        elif session["tipo_user"]==2:
+            return redirect(url_for("menu_area_de_legales"))
+        else:
+            logout()
     return render_template("login.html")
+
+def logout():
+    if session.get("id_usuario"):
+        temp=[]
+        for each in session:
+            temp.append(each)
+        for each in temp:
+            if each != "_permanent":
+                del session[each]
+    return redirect(url_for("login_page"))
 
 def login():
     data = request.form
     if bonita.autenticion(data["username"],data["password"]):
-        #ver tipo de usuario y redireccionar
-        return Response(status=200)
+        try:
+            r= requests.get("http://localhost:8080/bonita/API/identity/role?f=name=MesaDeEntrada",headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+            idMesa=r.json()[0]["id"]
+        except:
+            print("no pude levantar el id de mesa de entrada")
+
+        try:
+            r= requests.get("http://localhost:8080/bonita/API/identity/role?f=name=AreaDeLegales",headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+            idLegales=r.json()[0]["id"]
+        except:
+            print("no pude levantar el id de area legales")
+
+        r = requests.get("http://localhost:8080/bonita/API/identity/user?f=userName=" + data["username"],headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+        idUser= r.json()[0]["id"]
+        r2 = requests.get("http://localhost:8080/bonita/API/identity/membership?f=user_id=" + idUser, headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+        tipo_user= r2.json()[0]["role_id"]
+        session["id_usuario"]=idUser
+        if (tipo_user==idMesa):
+            session["tipo_user"]=1
+            return redirect(url_for("menu_mesa_de_entrada"))
+        elif tipo_user==idLegales:
+            session["tipo_user"]=2
+            return redirect(url_for("menu_area_de_legales"))
+        else:
+            return redirect(url_for("login_page"))
     else:
+        flash("Usuario desactivado.",category="error")
         return jsonify({'msg':'Los datos ingresados son incorrectos'}),400,{'ContentType':'application-json'}
 
 def menu_mesaEntrada():
+    if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
+        return redirect(url_for("login_page"))
     return render_template("menu_mesa_de_entrada.html")
 
+def menu_legales():
+    if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=2):
+        return redirect(url_for("login_page"))
+    return render_template("menu_area_de_legales.html")
 
+def evaluar_solicitudes():
+    if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
+        return redirect(url_for("login_page"))
+        
+    from app.models.sociedad import Sociedad
 
+    socis= Sociedad.all()
+    sociedades=[]
+    for each in socis:
+        soci={}
+        soci["sociedad"]=each
+        soci["paises"]=each.paises.split(",")
+        sociedades.append(soci)
+    return render_template("evaluar_solicitudes.html",sociedades=sociedades)
 
 
 

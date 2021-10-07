@@ -1,0 +1,162 @@
+{% extends "layout.html" %}
+{% block title %}Sociedad anonima{% endblock %}
+{% block head %}
+  {{ super() }}
+     <style>
+        body{background: rgb(104,91,111);background: linear-gradient(145deg, rgba(104,91,111,1) 0%, rgba(168,126,136,1) 11%, rgba(199,147,151,1) 20%, rgba(249,193,165,1) 50%, rgba(238,169,175,1) 65%, rgba(168,126,136,1) 85%, rgba(104,91,111,1) 100%);}
+        .form-heading { color:#fff; font-size:23px;}
+        .panel h2{ color:#444444; font-size:18px; margin:0 0 8px 0;}
+        .panel p { color:#777777; font-size:14px; margin-bottom:30px; line-height:24px;}
+        .login-form .form-control {
+        background: #f7f7f7 none repeat scroll 0 0;
+        border: 1px solid #d4d4d4;
+        border-radius: 4px;
+        font-size: 14px;
+        height: 50px;
+        line-height: 50px;
+        }
+        .main-div {
+        background: #ffffff none repeat scroll 0 0;
+        border-radius: 2px;
+        margin: 10px auto 30px;
+        max-width: 80%;
+        padding: 50px 70px 70px 71px;
+        }
+
+        .login-form .form-group {
+        margin-bottom:10px;
+        }
+        .login-form{ text-align:center;}
+        .forgot a {
+        color: #777777;
+        font-size: 14px;
+        text-decoration: underline;
+        }
+        .login-form  .btn.btn-primary {
+        background: #f0ad4e none repeat scroll 0 0;
+        border-color: #f0ad4e;
+        color: #ffffff;
+        font-size: 14px;
+        width: 100%;
+        height: 50px;
+        line-height: 50px;
+        padding: 0;
+        }
+        .forgot {
+        text-align: left; margin-bottom:30px;
+        }
+        .botto-text {
+        color: #ffffff;
+        font-size: 14px;
+        margin: auto;
+        }
+        .login-form .btn.btn-primary.reset {
+        background: #ff9900 none repeat scroll 0 0;
+        }
+        .back { text-align: left; margin-top:10px;}
+        .back a {color: #444444; font-size: 13px;text-decoration: none;}
+        .btn-outline-primary{border-color: #f0ad4e; color: #f0ad4e}
+        .btn-outline-primary:hover{border-color: #f0ad4e;background-color:#f0ad4e; color: white ;}
+    </style>
+{% endblock %}
+{% block content %}
+    
+    <div class="container">
+        <div class="login-form">
+            <div class="main-div">
+                <div class="panel">
+                    <h2>EVALUAR SOLICITUDES</h2>
+                </div>
+                <div id="sociedadesDiv">
+                    {%for sociedad in sociedades %}
+                        <div class="row-group" style="margin-bottom: 1rem; background-color: rgba(0,0,0,.15); border-radius: .15rem; padding: .5rem;">
+                            <div style="border: 1px solid rgba(0,0,0,0.25); text-align: center; font-weight: bold;">
+                                SOLICITUD {{sociedad.sociedad.id}}
+                            </div>
+                            <div class="row">
+                                <div class="col-9" style="text-align: left;">
+                                    
+                                    <div class="row-group" style="margin-bottom: 1rem;">
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <div class="col" style="margin: 0; padding: .5rem 0 0 0; text-align: left;"> 
+                                                    <span style="margin-left: 1rem; font-weight: bold;">Nombre</span><br>
+                                                    <span style="margin-left:1.5rem;">{{sociedad.sociedad.nombre}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="col" style="margin: 0; padding: .5rem 0 0 0; text-align: left;"> 
+                                                    <span style="margin-left: 1rem; font-weight: bold;">Fecha Creacion</span><br>
+                                                    <span style="margin-left:1.5rem;"> {{sociedad.sociedad.fechaCreacion.strftime("%d/%m/%Y")}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="col" style="margin: 0; padding: .5rem 0 0 0; text-align: left;"> 
+                                                    <span style="margin-left: 1rem; font-weight: bold;">Correo Apoderado</span><br>
+                                                    <span style="margin-left:1.5rem;"> {{sociedad.sociedad.correoApoderado}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="col" style="margin: 0; padding: .5rem 0 0 0; text-align: left;"> 
+                                                    <span style="margin-left: 1rem; font-weight: bold;">Domicilio Legal</span><br>
+                                                    <span style="margin-left:1.5rem;"> {{sociedad.sociedad.domicilioLegal}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="col" style="margin: 0; padding: .5rem 0 0 0; text-align: left;"> 
+                                                    <span style="margin-left: 1rem; font-weight: bold;">Domicilio Real</span><br>
+                                                    <span style="margin-left:1.5rem;"> {{sociedad.sociedad.domicilioReal}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col" style="margin: 0; text-align: left;"> 
+                                                <span style="margin-left: 1rem; font-weight: bold;">Paises a Exportar</span><br>
+                                                <span style="margin-left: 1.5rem;">{{sociedad.sociedad.paises}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <span style="font-weight: bold; padding-left: 15px;">Listado de Socios</span><br>
+                                    <div class="row" style="padding-left: 15px;">
+                                        <div class="col">
+    
+                                            <ul style="list-style: circle;">
+                                                {%for each in sociedad.sociedad.socios%}
+                                                <li>
+                                                    <div class="row">    
+                                                        <div class="col-8">
+                                                            {{each.apellido}}, {{each.nombre}} 
+                                                        </div>
+                                                        <div class="col-4">
+                                                            {{each.porcentaje}}%
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                {%endfor%}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 my-auto ">
+                                    <div class="align-self-center">
+                                        <button type="button" class="btn btn-outline-success btn-block">Confirmar</button>
+                                        <button type="button" id="buttonRechazar{{loop.index}}" class="btn btn-outline-danger btn-block">Rechazar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {%endfor%}
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block scripts %}
+    <script src="{{url_for('static',filename='evaluar_solicitudes.js')}}"></script>
+{% endblock %}

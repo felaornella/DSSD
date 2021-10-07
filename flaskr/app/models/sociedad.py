@@ -46,6 +46,6 @@ class Sociedad(db.Model):
 
     # --- Desarrollo de Activar/Desactivar Turno_Final ---
 
-    def buscarTurno_FinalPorID(id):
+    def buscarSociedadPorId(id):
         turno = Sociedad.query.filter_by(id=id).first()
         return turno

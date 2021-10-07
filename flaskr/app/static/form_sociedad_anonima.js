@@ -74,7 +74,7 @@ function agregarSocio() {
     
     var socioEntero = document.createElement("div")
     socioEntero.setAttribute("class","row  align-items-center")
-    socioEntero.setAttribute("style","margin-bottom:1rem")
+    socioEntero.setAttribute("style","margin-bottom:1rem; border-bottom: 1.5px solid rgba(0,0,0,0.25); padding-bottom:.5rem")
     socioEntero.setAttribute("id","socio"+sociosCount)
     socioEntero.setAttribute("perc",porcentaje)
     socioEntero.setAttribute("nombre", $("#nombreSocioNuevo").val().trim())
