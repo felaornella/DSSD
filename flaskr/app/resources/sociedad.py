@@ -99,7 +99,7 @@ def login():
             return redirect(url_for("login_page"))
     else:
         flash("Usuario desactivado.",category="error")
-        return jsonify({'msg':'Los datos ingresados son incorrectos'}),400,{'ContentType':'application-json'}
+        return redirect(url_for("login_page"))
 
 def menu_mesaEntrada():
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
@@ -114,7 +114,7 @@ def menu_legales():
 def evaluar_solicitudes():
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
         return redirect(url_for("login_page"))
-        
+
     from app.models.sociedad import Sociedad
 
     socis= Sociedad.all()
