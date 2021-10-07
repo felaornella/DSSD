@@ -21,16 +21,18 @@ class Sociedad(db.Model):
     paises = db.Column(db.Text(),nullable=True)
 
     socios = db.relationship("Socio", secondary=association_table,lazy='subquery', backref=db.backref('sociedad', lazy=True))
-                                            
+    caseId=  db.Column(db.Integer(),nullable=True) 
+    estado =  db.Column(db.String(255),nullable=True)                                   
 
     
-    def __init__(self, nombre, fechaCreacion, domicilioLegal, domicilioReal, correoApoderado, paises):
+    def __init__(self, nombre, fechaCreacion, domicilioLegal, domicilioReal, correoApoderado, paises,estado):
         self.nombre = nombre
         self.fechaCreacion = fechaCreacion
         self.domicilioLegal = domicilioLegal
         self.domicilioReal = domicilioReal
         self.correoApoderado = correoApoderado
         self.paises = paises
+        self.estado = estado
 
     @staticmethod
     def all():

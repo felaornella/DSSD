@@ -69,7 +69,7 @@
                 </div>
                 <div id="sociedadesDiv">
                     {%for sociedad in sociedades %}
-                        <div class="row-group" style="margin-bottom: 1rem; background-color: rgba(0,0,0,.15); border-radius: .15rem; padding: .5rem;">
+                        <div class="row-group" id="solicitudDiv{{sociedad.sociedad.id}}" style="margin-bottom: 1rem; background-color: rgba(0,0,0,.15); border-radius: .15rem; padding: .5rem;">
                             <div style="border: 1px solid rgba(0,0,0,0.25); text-align: center; font-weight: bold;">
                                 SOLICITUD {{sociedad.sociedad.id}}
                             </div>
@@ -146,7 +146,7 @@
                                 <div class="col-3 my-auto ">
                                     <div class="align-self-center">
                                         <button type="button" class="btn btn-outline-success btn-block">Confirmar</button>
-                                        <button type="button" id="buttonRechazar{{loop.index}}" class="btn btn-outline-danger btn-block">Rechazar</button>
+                                        <button type="button" id="buttonRechazar{{loop.index}}" data-idsol={{sociedad.sociedad.id}} class="btn btn-outline-danger btn-block">Rechazar</button>
                                     </div>
                                 </div>
                             </div>

@@ -255,7 +255,7 @@ function enviar(){
         error: function(response) {
           Swal.fire({
             icon: 'error',
-            title: response.responseJSON.msg,
+            title: response.responseJSON,
             showConfirmButton: true,
             timerProgressBar: true,
             timer: 2500

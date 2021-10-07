@@ -20,7 +20,7 @@ def nuevaPag():
 def nueva():
     data= request.get_json(force=True)
     
-    sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["emailApoderado"],data["paisesExportacion"])
+    sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["emailApoderado"],data["paisesExportacion"],"Esperando Confirmacion")
 
     print(data["socios"])
 
@@ -28,25 +28,34 @@ def nueva():
         soc = Socio(data["socios"][each]["nombre"],data["socios"][each]["apellido"],data["socios"][each]["porcentaje"],data["socios"][each]["apoderado"])
         sociedad.socios.append(soc)
 
+
+    bonita.autenticion('solicitante.general','solicitante')
+    idProc= bonita.getProcessId("DSSD - Proceso de Registro de SA")
+    caseId= bonita.initiateProcess(idProc)
+    sociedad.caseId=caseId
     sociedad.save()
-    print(sociedad.id)
-    guardarEnBonita(sociedad.id,sociedad.correoApoderado)
+    #print(sociedad.id)
+    bonita.setVariable(caseId,"emailApoderado",sociedad.correoApoderado,"java.lang.String")
+    bonita.setVariable(caseId,"idSolicitud",sociedad.id,"java.lang.String")
+    
     return Response(status=200)
 
 def guardarEnBonita(id,emailApoderado):
     
-    bonita.autenticion('walter.bates','bpm')
+    bonita.autenticion('solicitante.general','solicitante')
     idProc= bonita.getProcessId("DSSD - Proceso de Registro de SA")
     caseId= bonita.initiateProcess(idProc)
-
+   
     bonita.setVariable(caseId,"emailApoderado",emailApoderado,"java.lang.String")
     bonita.setVariable(caseId,"idSolicitud",id,"java.lang.String")
 
-    activityId= bonita.searchActivityByCase(caseId)
     
-    bonita.assignTask(activityId,"4")
+    return caseId
+    #activityId= bonita.searchActivityByCase(caseId)
+    
+    #bonita.assignTask(activityId,"4")
     #bonita.completeActivity(activityId)
-    return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
+    #return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
 
 
 def loginPage():
@@ -86,13 +95,21 @@ def login():
 
         r = requests.get("http://localhost:8080/bonita/API/identity/user?f=userName=" + data["username"],headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
         idUser= r.json()[0]["id"]
-        r2 = requests.get("http://localhost:8080/bonita/API/identity/membership?f=user_id=" + idUser, headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
-        tipo_user= r2.json()[0]["role_id"]
         session["id_usuario"]=idUser
-        if (tipo_user==idMesa):
+        r2 = requests.get("http://localhost:8080/bonita/API/identity/membership?f=user_id=" + idUser, headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+  
+        mesaEntrada=False
+        areaLegales=False
+        for each in r2.json():
+            if not mesaEntrada and each["role_id"]==idMesa:                
+                mesaEntrada=True
+            if not areaLegales and each["role_id"]==idLegales:
+                areaLegales=True
+       
+        if (mesaEntrada):
             session["tipo_user"]=1
             return redirect(url_for("menu_mesa_de_entrada"))
-        elif tipo_user==idLegales:
+        elif areaLegales:
             session["tipo_user"]=2
             return redirect(url_for("menu_area_de_legales"))
         else:
@@ -115,20 +132,34 @@ def evaluar_solicitudes():
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
         return redirect(url_for("login_page"))
 
-    from app.models.sociedad import Sociedad
+    
 
     socis= Sociedad.all()
     sociedades=[]
     for each in socis:
-        soci={}
-        soci["sociedad"]=each
-        soci["paises"]=each.paises.split(",")
-        sociedades.append(soci)
+        if(each.estado=="Esperando Confirmacion"):
+            soci={}
+            soci["sociedad"]=each
+            soci["paises"]=each.paises.split(",")
+            sociedades.append(soci)
     return render_template("evaluar_solicitudes.html",sociedades=sociedades)
 
 
+def rechazar_solicitud():
+    data= request.get_json(force=True)
 
 
+    socis= Sociedad.buscarSociedadPorId(data["solicitudId"])
+    socis.estado="Esperando Correccion"
+    socis.save()
+    activityId= bonita.searchActivityByCase(socis.caseId)
+
+    bonita.setVariable(socis.caseId,"solicitudValido",False,"java.lang.Boolean")
+    bonita.setVariable(socis.caseId,"comentarios",data["comentario"],"java.lang.String")
+
+    bonita.assignTask(activityId,session["id_usuario"])
+    bonita.completeActivity(activityId)
+    return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
 
 # Authenticate to Bonita
 # To log in, use the following request:

@@ -1,10 +1,14 @@
 var count_soc= document.getElementById("sociedadesDiv").children.length
 
 for (let i=1; i<=count_soc;i++){
+   
     $("#buttonRechazar"+i).on("click",pedirRazon)
+    
 }
 
 function pedirRazon(){
+    solicitudId= $(this).data('idsol')
+    
     Swal.fire({
         input: 'textarea',
         inputLabel: 'Motivo de Rechazo',
@@ -27,9 +31,39 @@ function pedirRazon(){
                 "El tamaño máximo permitido es de 250 caracteres"
               ) 
             }else{
-              alert(motivoRechazo)
+              data2={"comentario":motivoRechazo}
+              data2["solicitudId"]=solicitudId
+              
+              $.post({
+                url: "/rechazar_solicitud",
+                processData: false,
+                contentType: false,
+                datatType: "json",
+                data: JSON.stringify(data2),
+                success: function(response){
+                    Swal.fire({
+                      icon: 'success',
+                      title:'Comentario enviado con exito',
+                      timer: 2000,
+                    })
+                    borrarSolicitud(solicitudId)
+                },
+                error: function(response) {
+                  Swal.fire({
+                    icon: 'error',
+                    title: response.responseJSON,
+                    showConfirmButton: true,
+                    timerProgressBar: true,
+                    timer: 2500
+                  })
+                }
+              })
             }
           }
         }
       })
+}
+
+function borrarSolicitud(id){
+  document.getElementById("sociedadesDiv").removeChild(document.getElementById("solicitudDiv"+id))
 }

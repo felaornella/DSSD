@@ -43,3 +43,11 @@ def assignTask(activityId,idUser):
 def completeActivity(activityId):
     res = requests.post("http://localhost:8080/bonita/API/bpm/userTask/"+activityId+"/execution", headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
     
+def checkRole(role,idUser):
+    r = requests.get("http://localhost:8080/bonita/API/identity/membership?f=user_id=" + idUser, headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+    tipo_user= r.json()
+    for x in tipo_user:
+        if (x["role_id"]==role):
+            return True
+    return False
+    
