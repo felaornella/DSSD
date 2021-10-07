@@ -60,6 +60,16 @@ def login():
     else:
         return jsonify({'msg':'Los datos ingresados son incorrectos'}),400,{'ContentType':'application-json'}
 
+def menu_mesaEntrada():
+    return render_template("menu_mesa_de_entrada.html")
+
+
+
+
+
+
+
+
 # Authenticate to Bonita
 # To log in, use the following request:
 # Request URL

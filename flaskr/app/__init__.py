@@ -59,6 +59,7 @@ def create_app(environment="development"):
     app.add_url_rule("/login", "login", sociedad.login,methods=["POST"])
     app.add_url_rule("/nueva", "nueva_sa", sociedad.nuevaPag,methods=["GET"])
     app.add_url_rule("/nueva", "nueva_sa_agregar", sociedad.nueva,methods=["POST"])
+    app.add_url_rule("/menu_mesa_de_entrada", "menu_mesa_de_entrada", sociedad.menu_mesaEntrada,methods=["GET"])
     return app
 
 '''

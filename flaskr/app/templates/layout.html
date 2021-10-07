@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     {% block head %}
-    <meta name="viewport" content="width=device-width, user-scalable=no">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css" />
@@ -13,20 +11,14 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>{% block title %}{% endblock %}</title>
     {% endblock %}
+    <style>
+      body{ background-image:url("https://hdwallsource.com/img/2014/9/blur-26347-27038-hd-wallpapers.jpg"); background-repeat:no-repeat; background-position:center; background-size:cover; padding:10px;}
+    </style>
   </head>
 
   <body>
-    <div id="navbar">
-      {% include "navbar.html" %}
-    </div>
-    <div id="content">
-      {% block content %}
-      {% endblock %}
-    </div>
-    <div id="footer">
-      {% block footer %}
-      {% endblock %}
-    </div>
+    {% block content %}
+    {% endblock %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
         crossorigin="anonymous">

@@ -4,7 +4,7 @@
   {{ super() }}
 {% endblock %}
 {% block content %}
-<div class="card">
+<div class="card" style="background-color: rgba(255,255,255,.5);">
     <div class="card-header">
       <h1>Registre una S.A.</h1>
     </div>
@@ -30,7 +30,7 @@
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="estatuto">Estatuto de conformación firmado por escribano público: </label>
             <div class="col-sm-10">
-                <input class="form-control" type="file" accept=".docx,.odt,.pdf" id="estatuto" name="estatuto">
+                <input class="form-control" type="file" accept=".docx,.odt,.pdf" id="estatuto" name="estatuto" style="padding-top: .2rem;">
             </div>
         </div>
 
@@ -85,7 +85,7 @@
             <input class="form-control" type="text" placeholder="Nombre Socio" id="nombreSocioNuevo"><br>
             <input class="form-control" type="text" placeholder="Apellido Socio" id="apellidoSocioNuevo"><br>
             <input class="form-control" type="number" placeholder="Porcentaje Socio" id="porcentaje"><br>
-            <button type="button" class="btn btn-primary" id="buttonAddSocioNuevo">Agregar</button>
+            <button type="button" class="btn btn-primary" id="buttonAddSocioNuevo" style="width: 60%; margin-left: 20%; margin-right: 20%;">Agregar</button>
           </div>
           <div class="col-4" id="bloqueListado">
             
