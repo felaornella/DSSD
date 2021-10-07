@@ -1,5 +1,6 @@
 from flask import Response,jsonify, render_template, request
 import requests
+from werkzeug.utils import redirect
 import app.helpers.bonita as bonita
 from app.models.sociedad import Sociedad
 from app.models.socio import Socio
@@ -48,6 +49,16 @@ def guardarEnBonita(id,emailApoderado):
     return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
 
 
+def loginPage():
+    return render_template("login.html")
+
+def login():
+    data = request.form
+    if bonita.autenticion(data["username"],data["password"]):
+        #ver tipo de usuario y redireccionar
+        return Response(status=200)
+    else:
+        return jsonify({'msg':'Los datos ingresados son incorrectos'}),400,{'ContentType':'application-json'}
 
 # Authenticate to Bonita
 # To log in, use the following request:

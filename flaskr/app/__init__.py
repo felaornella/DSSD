@@ -55,9 +55,10 @@ def create_app(environment="development"):
     UPLOAD_FOLDER = 'static/uploads'
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+    app.add_url_rule("/login", "login_page", sociedad.loginPage,methods=["GET"])
+    app.add_url_rule("/login", "login", sociedad.login,methods=["POST"])
     app.add_url_rule("/nueva", "nueva_sa", sociedad.nuevaPag,methods=["GET"])
     app.add_url_rule("/nueva", "nueva_sa_agregar", sociedad.nueva,methods=["POST"])
-    
     return app
 
 '''

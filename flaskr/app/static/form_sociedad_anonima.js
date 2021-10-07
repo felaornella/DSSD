@@ -77,7 +77,7 @@ function agregarSocio() {
     socioEntero.setAttribute("style","margin-bottom:1rem")
     socioEntero.setAttribute("id","socio"+sociosCount)
     socioEntero.setAttribute("perc",porcentaje)
-    socioEntero.setAttribute("nombre",nombre)
+    socioEntero.setAttribute("nombre", $("#nombreSocioNuevo").val().trim())
     socioEntero.setAttribute("apellido",$("#apellidoSocioNuevo").val().trim())
     socioEntero.appendChild(colSocio)
     socioEntero.appendChild(colButton)
@@ -247,18 +247,34 @@ function enviar(){
         success: function(response){
             Swal.fire({
               icon: 'success',
-              title:'Bien capo',
+              title:'Sociedad cargada con exito',
               timer: 2000,
             })
+            limpiarForm()
         },
         error: function(response) {
           Swal.fire({
             icon: 'error',
-            title: "La cague",
+            title: response.responseJSON.msg,
             showConfirmButton: true,
             timerProgressBar: true,
             timer: 2500
           })
         }
     })
+}
+
+function limpiarForm(){
+    $("#nombreSociedad").val("")
+    $("#fechaCreacion").val("")
+    //$("#estatuto").val("")   ver como hacer con tipo file
+    $("#domicilioLegal").val("")
+    $("#domicilioReal").val("")
+    $("#email").val("")
+    $("#paisesExportacion").val("")
+    $('.selectpicker').selectpicker('refresh');
+
+    for (let i=document.getElementById("bloqueListado").children.length -1;i>=0;i--){
+        quitar(document.getElementById("bloqueListado").children[i].getAttribute("id"))
+    }
 }

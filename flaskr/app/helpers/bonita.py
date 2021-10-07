@@ -4,8 +4,13 @@ def autenticion(usuario,contraseña):
     body = {'username':usuario, 'password':contraseña, 'redirect':'false'}
   
     res = requests.post('http://localhost:8080/bonita/loginservice', data=body,headers={"Content-Type" : "application/x-www-form-urlencoded"})
-    session["X-Bonita-API-Token"] = res.cookies.get('X-Bonita-API-Token')
-    session["Cookies-bonita"] = "JSESSIONID="+res.cookies.get('JSESSIONID')+";X-Bonita-API-Token="+res.cookies.get('X-Bonita-API-Token')
+    if res.status_code==200:
+        session["X-Bonita-API-Token"] = res.cookies.get('X-Bonita-API-Token')
+        session["Cookies-bonita"] = "JSESSIONID="+res.cookies.get('JSESSIONID')+";X-Bonita-API-Token="+res.cookies.get('X-Bonita-API-Token')
+        return True
+    else:
+        print("El codigo de error fue: " + str(res.status_code))
+        return False
 
     #print(session["X-Bonita-API-Token"])
     
