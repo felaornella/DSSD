@@ -24,8 +24,8 @@ def getProcessId(nombreProceso):
 
 
 def setVariable(caseId,variable,valor,tipo):
-    body= {"value":valor,"type":tipo}
-    res = requests.put("http://localhost:8080/bonita/API/bpm/caseVariable/"+str(caseId)+"/"+variable,json=body,headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+    body= {"value":str(valor),"type":str(tipo)}
+    res = requests.put("http://localhost:8080/bonita/API/bpm/caseVariable/"+str(caseId)+"/"+str(variable),json=body,headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
 
 def initiateProcess(idProc):
     res = requests.post("http://localhost:8080/bonita/API/bpm/process/"+idProc+"/instantiation", headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
