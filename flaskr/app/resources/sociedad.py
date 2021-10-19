@@ -4,6 +4,9 @@ from werkzeug.utils import redirect
 import app.helpers.bonita as bonita
 from app.models.sociedad import Sociedad
 from app.models.socio import Socio
+import os
+import json
+
 
 def nuevaPag():
     paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
@@ -18,25 +21,40 @@ def nuevaPag():
     return render_template("form_sociedad_anonima.html",paises=nomPaises)
 
 def nueva():
-    data= request.get_json(force=True)
+    data= request.form.to_dict()
+    file= request.files['estatuto']
+
     
-    sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["emailApoderado"],data["paisesExportacion"],"Esperando Confirmacion")
-
+    sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["email"],data["paisesExportacion"],"Esperando Confirmacion")
+    
     print(data["socios"])
+    print(json.loads(data["socios"]))
+    
+    # print(dict(data["socios"]))
 
-    for each in data["socios"]:
-        soc = Socio(data["socios"][each]["nombre"],data["socios"][each]["apellido"],data["socios"][each]["porcentaje"],data["socios"][each]["apoderado"])
+    for each in json.loads(data["socios"]).values():
+        print(each)
+        soc = Socio(each["nombre"],each["apellido"],each["porcentaje"],each["apoderado"])
         sociedad.socios.append(soc)
 
 
-    bonita.autenticion('solicitante.general','solicitante')
-    idProc= bonita.getProcessId("DSSD - Proceso de Registro de SA")
-    caseId= bonita.initiateProcess(idProc)
-    sociedad.caseId=caseId
+    # bonita.autenticion('solicitante.general','solicitante')
+    # idProc= bonita.getProcessId("DSSD - Proceso de Registro de SA")
+    # caseId= bonita.initiateProcess(idProc)
+    # sociedad.caseId=caseId
     sociedad.save()
     #print(sociedad.id)
-    bonita.setVariable(caseId,"emailApoderado",sociedad.correoApoderado,"java.lang.String")
-    bonita.setVariable(caseId,"idSolicitud",sociedad.id,"java.lang.String")
+    file = request.files['estatuto']
+    if file:
+        filename = "estatuto"+str(sociedad.id) +"."+ file.filename.split(".")[-1]
+        APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+        
+        UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
+        file.save(os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
+        # UPLOAD_FOLDER = url_for("static",filename= "")
+        # file.save((UPLOAD_FOLDER+filename))
+    # bonita.setVariable(caseId,"emailApoderado",sociedad.correoApoderado,"java.lang.String")
+    # bonita.setVariable(caseId,"idSolicitud",sociedad.id,"java.lang.String")
     
     return Response(status=200)
 

@@ -207,12 +207,17 @@ function quitarDeSelect(id){
 
 function enviar(){
     var data2={}
-    data2['nombreSociedad']=$("#nombreSociedad").val().trim()
-    data2['fechaCreacion']=$("#fechaCreacion").val()
-    data2['domicilioLegal']=$("#domicilioLegal").val()
-    data2['domicilioReal']=$("#domicilioReal").val()
-    data2['emailApoderado']=$("#email").val()
-    
+    // data2['nombreSociedad']=$("#nombreSociedad").val().trim()
+    // data2['fechaCreacion']=$("#fechaCreacion").val()
+    // data2['domicilioLegal']=$("#domicilioLegal").val()
+    // data2['domicilioReal']=$("#domicilioReal").val()
+    // data2['emailApoderado']=$("#email").val()
+    // data2['estatuto']=$("#estatuto").val()
+    // print(data2['estatuto'])
+	
+	
+
+	
     paisesStr=""
     paises = $("#paisesExportacion").val()
     for (let i=0; i<paises.length; i++){
@@ -236,14 +241,25 @@ function enviar(){
         }
     }
 
-    data2["socios"]=sociosDic
 
+	datos= new FormData(document.getElementById("formulario"))
+	// datos.append('nombreSociedad',$("#nombreSociedad").val().trim())
+	// datos.append('fechaCreacion',$("#fechaCreacion").val())
+	// datos.append('domicilioLegal',$("#domicilioLegal").val())
+	// datos.append('domicilioReal',$("#domicilioReal").val())
+	// datos.append('emailApoderado',$("#email").val())
+	var myFile = $('#estatuto').prop('files')
+	datos.append('estatuto',myFile)
+	console.log(myFile)
+	datos.append("paisesExportacion",paisesStr)
+	datos.append("socios",JSON.stringify(sociosDic))
+	
     $.post({
         url: "/nueva",
         processData: false,
         contentType: false,
-        datatType: "json",
-        data: JSON.stringify(data2),
+		processData: false,
+        data: datos,
         success: function(response){
             Swal.fire({
               icon: 'success',

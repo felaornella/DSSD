@@ -40,6 +40,11 @@ def create_app(environment="development"):
     Session(app)
     Bootstrap(app)
 
+    # archivos
+    UPLOAD_FOLDER = '/static/uploads'
+    ALLOWED_EXTENSIONS = {'pdf'}
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    
     # Configure db
     db.init_app(app)
 
