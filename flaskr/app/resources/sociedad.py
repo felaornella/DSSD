@@ -68,25 +68,28 @@ def estampillar(): #soc_id
     soc= Sociedad.buscarSociedadPorId(soc_id)
     
     # buscar expendiente
-    filename = "estatuto"+str(soc_id)# +"."+ file.filename.split(".")[-1]
+    filename = "estatuto"+str(soc_id)+".pdf"# +"."+ file.filename.split(".")[-1]
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
     UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
     path= (os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
-    
-    
+    import base64
+    with open(path, "rb") as pdf_file:
+        encoded_string = base64.b64encode(pdf_file.read())
+        
+    print(encoded_string)
     # cargar datos de sociedad y expediente
     datos= {
     "numeroExpediente": str(soc.id),
-    "extension": ".pdf",
-    "size": str(os.path.getsize(path))}
-    hash=requests.post("https://dssd-estatuto.herokuapp.com/api/upload", data=datos, headers={"Authorization": "Bearer "+token})
-    hash = json.loads(hash.content.decode())["hash"]
+    "file": encoded_string,
+    }
+    res =requests.post("https://dssd-estatuto.herokuapp.com/api/upload/file", data=datos, headers={"Authorization": "Bearer "+token})
+    hash = res.json()["hash"]
 
 
     soc.hash = hash
     soc.save()
     
-    return Response(status=200)
+    return jsonify({'hash':hash}),200,{'ContentType':"application/json"} #Response(status=200)
     
 
     
