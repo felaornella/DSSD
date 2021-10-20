@@ -227,7 +227,6 @@ function enviar(){
             paisesStr = paises[i]
         }
     }
-    
     data2["paisesExportacion"]=paisesStr
 
     socios = document.getElementById("bloqueListado").children
@@ -251,7 +250,7 @@ function enviar(){
 	var myFile = $('#estatuto').prop('files')
 	datos.append('estatuto',myFile)
 	console.log(myFile)
-	datos.append("paisesExportacion",paisesStr)
+	datos.append("paisesExpo",paisesStr)
 	datos.append("socios",JSON.stringify(sociosDic))
 	
     $.post({
