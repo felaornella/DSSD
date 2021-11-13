@@ -4,8 +4,8 @@ from werkzeug.utils import redirect
 import app.helpers.bonita as bonita
 from app.models.sociedad import Sociedad
 from app.models.socio import Socio
-
-
+import os
+import json
 
 
 def nuevaPag():
@@ -21,14 +21,18 @@ def nuevaPag():
     return render_template("form_sociedad_anonima.html",paises=nomPaises)
 
 def nueva():
-    data= request.get_json(force=True)
-    
-    sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["emailApoderado"],data["paisesExportacion"],"Esperando Confirmacion")
-    
-    print(data["estatuto"])
+    data= request.form.to_dict()
+    file= request.files['estatuto']
 
-    for each in data["socios"]:
-        soc = Socio(data["socios"][each]["nombre"],data["socios"][each]["apellido"],data["socios"][each]["porcentaje"],data["socios"][each]["apoderado"])
+    
+    sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["email"],data["paisesExpo"],"Esperando Confirmacion")
+
+    
+    # print(dict(data["socios"]))
+
+    for each in json.loads(data["socios"]).values():
+        print(each)
+        soc = Socio(each["nombre"],each["apellido"],each["porcentaje"],each["apoderado"])
         sociedad.socios.append(soc)
 
 
@@ -36,14 +40,65 @@ def nueva():
     idProc= bonita.getProcessId("DSSD - Proceso de Registro de SA")
     caseId= bonita.initiateProcess(idProc)
     sociedad.caseId=caseId
+    
     sociedad.save()
     #print(sociedad.id)
+    file = request.files['estatuto']
+    if file:
+        filename = "estatuto"+str(sociedad.id)# +"."+ file.filename.split(".")[-1]
+        APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+        
+        UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
+        file.save(os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
+        # UPLOAD_FOLDER = url_for("static",filename= "")
+        # file.save((UPLOAD_FOLDER+filename))
+        
     bonita.setVariable(caseId,"emailApoderado",sociedad.correoApoderado,"java.lang.String")
     bonita.setVariable(caseId,"idSolicitud",sociedad.id,"java.lang.String")
     
     return Response(status=200)
 
-#DEPRECATED
+def estampillar(): #soc_id
+    token = heroku_log()
+    token= json.loads(token.content.decode())["token"]
+    
+    #buscar socciedad
+    soc_id= request.args.get("id_soc")
+    soc= Sociedad.buscarSociedadPorId(soc_id)
+    
+    # buscar expendiente
+    filename = "estatuto"+str(soc_id)+".pdf"# +"."+ file.filename.split(".")[-1]
+    APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+    UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
+    path= (os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
+    import base64
+    with open(path, "rb") as pdf_file:
+        encoded_string = base64.b64encode(pdf_file.read())
+        
+    print(encoded_string)
+    # cargar datos de sociedad y expediente
+    datos= {
+    "numeroExpediente": str(soc.id),
+    "file": encoded_string,
+    }
+    res =requests.post("https://dssd-estatuto.herokuapp.com/api/upload/file", data=datos, headers={"Authorization": "Bearer "+token})
+    hash = res.json()["hash"]
+
+
+    soc.hash = hash
+    soc.save()
+    
+    return jsonify({'hash':hash}),200,{'ContentType':"application/json"} #Response(status=200)
+    
+
+    
+    
+
+def heroku_log():
+    datos={"email":"nahuel_bigu@gmail.com","password":"asd123"}
+    token=requests.post("https://dssd-estatuto.herokuapp.com/api/users/signin",data= datos)
+    return token
+    
 def guardarEnBonita(id,emailApoderado):
     
     bonita.autenticion('solicitante.general','solicitante')
@@ -176,6 +231,7 @@ def aceptar_solicitud():
     bonita.assignTask(activityId,session["id_usuario"])
     bonita.completeActivity(activityId)
     return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
+    
 # Authenticate to Bonita
 # To log in, use the following request:
 # Request URL

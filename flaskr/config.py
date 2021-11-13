@@ -10,6 +10,8 @@ class BaseConfig(object):
     DB_PASS = "db_pass"
     DB_NAME = "db_name"
     SECRET_KEY = "secret"
+    
+    
 
     #load_dotenv()
 
