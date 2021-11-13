@@ -68,7 +68,10 @@ def create_app(environment="development"):
 
     
     app.add_url_rule("/generar_qr/<id>", "generar_qr", qr.generar_qr,methods=["GET"])
-    app.add_url_rule("/qr/<id>", "obtener_qr", qr.obtener_qr,methods=["GET"])
+    app.add_url_rule("/qr/<hash>", "obtener_qr", qr.obtener_qr,methods=["GET"])
+    app.add_url_rule("/estatutos/<id>", "obtener_estatuto", sociedad.obtener_estatuo,methods=["GET"])
+    app.add_url_rule("/generar-carpeta-virtual/<id>", "generar_carpeta_virtual", sociedad.generar_carpeta_virtual,methods=["GET"])
+
     return app
 
 '''

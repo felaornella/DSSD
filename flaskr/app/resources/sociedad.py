@@ -1,4 +1,4 @@
-from flask import Response,jsonify, render_template, request, session, url_for, flash 
+from flask import Response,jsonify, render_template, request, session, url_for, flash ,send_file
 import requests
 from werkzeug.utils import redirect
 import app.helpers.bonita as bonita
@@ -6,7 +6,8 @@ from app.models.sociedad import Sociedad
 from app.models.socio import Socio
 import os
 import json
-
+import app.drive.GoogleDriveFlask as GD
+import base64
 
 def nuevaPag():
     paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
@@ -45,11 +46,12 @@ def nueva():
     #print(sociedad.id)
     file = request.files['estatuto']
     if file:
-        filename = "estatuto"+str(sociedad.id)# +"."+ file.filename.split(".")[-1]
+        filename = "estatuto_"+str(sociedad.id)# +"."+ file.filename.split(".")[-1]
         APP_ROOT = os.path.dirname(os.path.abspath(__file__))
         
-        UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
+        UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp','estatutos')
         file.save(os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
+        GD.subir_archivo("app/static/temp/estatutos/estatuto_"+id+".pdf",GD.folder_estatuto)
         # UPLOAD_FOLDER = url_for("static",filename= "")
         # file.save((UPLOAD_FOLDER+filename))
         
@@ -67,19 +69,24 @@ def estampillar(): #soc_id
     soc= Sociedad.buscarSociedadPorId(soc_id)
     
     # buscar expendiente
-    filename = "estatuto"+str(soc_id)+".pdf"# +"."+ file.filename.split(".")[-1]
+    filename = "estatuto_"+str(soc_id)+".pdf"# +"."+ file.filename.split(".")[-1]
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-    UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
+    UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp', 'estatutos')
     path= (os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
-    import base64
+    if not path.exists():
+        GD.bajar_acrchivo_por_nombre("estatuto_"+id+'.pdf',"app/static/temp/estatutos/")
+        if not path.exists():
+            print("no existe ni en drive")
+            return jsonify({'msg':'Estatuto not found'}),404,{'ContentType':"application/json"}
+    
     with open(path, "rb") as pdf_file:
         encoded_string = base64.b64encode(pdf_file.read())
         
     print(encoded_string)
     # cargar datos de sociedad y expediente
     datos= {
-    "numeroExpediente": str(soc.id),
-    "file": encoded_string,
+        "numeroExpediente": str(soc.id),
+        "file": encoded_string,
     }
     res =requests.post("https://dssd-estatuto.herokuapp.com/api/upload/file", data=datos, headers={"Authorization": "Bearer "+token})
     hash = res.json()["hash"]
@@ -231,7 +238,7 @@ def aceptar_solicitud():
     bonita.assignTask(activityId,session["id_usuario"])
     bonita.completeActivity(activityId)
     return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
-    
+
 # Authenticate to Bonita
 # To log in, use the following request:
 # Request URL
@@ -247,7 +254,60 @@ def aceptar_solicitud():
 # redirectUrl: the URL of the page to be displayed after a succesful login. If it is specified, then the a redirection after the login will be performed even if the "redirect" parameter is not present in the request.
 # tenant: the tenant to log in to (optional for Enterprise and Performance editions, not supported for Community, Teamwork and Efficiency editions)
 
+def obtener_estatuo(id):
+    soc= Sociedad.buscarSociedadPorId(id)
+    if soc is None:
+        return jsonify({'msg':'Sociedad no encontrada'}),404,{'ContentType':"application/json"}
 
+    filename = "estatuto_"+str(soc.id)+".pdf"# +"."+ file.filename.split(".")[-1]
+    APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+    UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp', 'estatutos')
+    path= (os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
+    if not path.exists():
+        GD.bajar_acrchivo_por_nombre("estatuto_"+soc.id+'.pdf',"app/static/temp/estatutos/")
+        if not path.exists():
+            print("no existe ni en drive")
+            return jsonify({'msg':'Estatuto not found'}),404,{'ContentType':"application/json"}
 
+    return send_file('static\\temp\\estatutos\\estatuto_'+soc.id+'.pdf', mimetype='application/pdf')
 
+def generar_carpeta_virtual(id):
+    soc= Sociedad.buscarSociedadPorId(id)
+    if soc is None:
+        return jsonify({'msg':'Sociedad no encontrada'}),404,{'ContentType':"application/json"}
     
+    # Si necesitas el estatuto usa el metodo obtener_estatuto, que te devuelve el file .
+    # Aunque el estatuto es un pdf para mi tenes como que poner un link que te deje obtener el estatuto. Con la ruta 
+
+    # Si necesitas el qr usa el metodo obtener_qr, que te devuelve el file de la imagen.
+    
+    
+    # obtener_qr(soc.id)   HAY QUE VER QUE TE DEVUELVE Y SI TE SIRVE
+    
+     
+
+    # Generar PDF con el estatuo y guardarlo esn static/temp/sociedades/sociedad_{hash}.pdf
+    from io import BytesIO, StringIO
+    from xhtml2pdf import pisa
+    from flask import  render_template
+    
+    # Generate PDF from render template hola.html
+     
+    html = render_template('hola.html',sociedad=soc)
+    
+    result = open("app/static/temp/sociedades/sociedad_"+str(soc.id)+".pdf","w+b")
+
+    pisa_status = pisa.CreatePDF(
+            html,                # the HTML to convert
+            dest=result)
+    
+    result.close()
+    
+
+    # Generar carpeta virtual (Subir a drive)
+    GD.subir_archivo("app/static/temp/sociedades/sociedad_"+str(soc.id)+".pdf",GD.folder_sociedades)
+    # Version 2
+    #pdf= None
+    #GD.subir_archivo2("sociedad_"+soc.hash+".pdf",pdf,GD.folder_sociedades)
+    # El pdf de la sociedad ya esta arriba en la nube 
+    return jsonify({'msg':'Carpeta virtual creada'}),200,{'ContentType':"application/json"}
