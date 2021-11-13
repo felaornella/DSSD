@@ -1,23 +1,16 @@
-from datetime import datetime, timedelta
-from os import path, environ
-from types import MethodType
-from flask import Flask, render_template, g, session, redirect, url_for, jsonify
-from flask.helpers import send_file
-from flask.wrappers import Response
+from datetime import timedelta
+from os import  environ
+from flask import Flask
 from flask_session import Session
-from werkzeug.wrappers import ResponseStreamMixin
 from config import config
 from app import db
 #from dotenv import load_dotenv
-from app.helpers import handler
-from app.helpers import auth as helper_auth
 from app.db_sqlalchemy import db_sqlalchemy
-from flask import request
 from flask_bootstrap import Bootstrap
-from werkzeug.utils import secure_filename
-from flask_cors import CORS,cross_origin
+from flask_cors import CORS
+
 from app.resources import sociedad
-import app.helpers.bonita as bonita 
+from app.resources import qr
 
 #va development
 def create_app(environment="development"):
@@ -65,6 +58,10 @@ def create_app(environment="development"):
     app.add_url_rule("/evaluar_solicitudes", "evaluar_solicitudes", sociedad.evaluar_solicitudes,methods=["GET"])
     app.add_url_rule("/rechazar_solicitud", "rechazar_solicitud", sociedad.rechazar_solicitud,methods=["POST"])
     app.add_url_rule("/aceptar_solicitud", "aceptar_solicitud", sociedad.aceptar_solicitud,methods=["POST"])
+
+    
+    app.add_url_rule("/generar_qr/<id>", "generar_qr", qr.generar_qr,methods=["GET"])
+    app.add_url_rule("/qr/<id>", "obtener_qr", qr.obtener_qr,methods=["GET"])
     return app
 
 '''

@@ -1,9 +1,12 @@
-from flask import Response,jsonify, render_template, request, session, url_for, flash
+from flask import Response,jsonify, render_template, request, session, url_for, flash 
 import requests
 from werkzeug.utils import redirect
 import app.helpers.bonita as bonita
 from app.models.sociedad import Sociedad
 from app.models.socio import Socio
+
+
+
 
 def nuevaPag():
     paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
@@ -21,8 +24,8 @@ def nueva():
     data= request.get_json(force=True)
     
     sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["emailApoderado"],data["paisesExportacion"],"Esperando Confirmacion")
-
-    print(data["socios"])
+    
+    print(data["estatuto"])
 
     for each in data["socios"]:
         soc = Socio(data["socios"][each]["nombre"],data["socios"][each]["apellido"],data["socios"][each]["porcentaje"],data["socios"][each]["apoderado"])
@@ -40,6 +43,7 @@ def nueva():
     
     return Response(status=200)
 
+#DEPRECATED
 def guardarEnBonita(id,emailApoderado):
     
     bonita.autenticion('solicitante.general','solicitante')
@@ -186,3 +190,8 @@ def aceptar_solicitud():
 # redirect: true or false. false is the default value if the redirect parameter is not specified. It indicates that the service should not redirect to Bonita Applications (after a successful login) or to the login page (after a login failure).
 # redirectUrl: the URL of the page to be displayed after a succesful login. If it is specified, then the a redirection after the login will be performed even if the "redirect" parameter is not present in the request.
 # tenant: the tenant to log in to (optional for Enterprise and Performance editions, not supported for Community, Teamwork and Efficiency editions)
+
+
+
+
+    
