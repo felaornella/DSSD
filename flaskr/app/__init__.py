@@ -55,6 +55,7 @@ def create_app(environment="development"):
     
     app.add_url_rule("/solicitud_estampillado", "estampillar", sociedad.estampillar,methods=["GET"])
 
+    app.add_url_rule("/", "home", sociedad.home,methods=["GET"])
     app.add_url_rule("/login", "login_page", sociedad.loginPage,methods=["GET"])
     app.add_url_rule("/logout", "logout", sociedad.logout,methods=["GET"])
     app.add_url_rule("/login", "login", sociedad.login,methods=["POST"])
@@ -65,13 +66,13 @@ def create_app(environment="development"):
     app.add_url_rule("/evaluar_solicitudes", "evaluar_solicitudes", sociedad.evaluar_solicitudes,methods=["GET"])
     app.add_url_rule("/rechazar_solicitud", "rechazar_solicitud", sociedad.rechazar_solicitud,methods=["POST"])
     app.add_url_rule("/aceptar_solicitud", "aceptar_solicitud", sociedad.aceptar_solicitud,methods=["POST"])
-
+    app.add_url_rule("/sociedad/<hash>", "vista_sociedad", sociedad.vista_sociedad,methods=["GET"])
     
     app.add_url_rule("/generar_qr/<id>", "generar_qr", qr.generar_qr,methods=["GET"])
     app.add_url_rule("/qr/<hash>", "obtener_qr", qr.obtener_qr,methods=["GET"])
     app.add_url_rule("/estatutos/<id>", "obtener_estatuto", sociedad.obtener_estatuo,methods=["GET"])
     app.add_url_rule("/generar-carpeta-virtual/<id>", "generar_carpeta_virtual", sociedad.generar_carpeta_virtual,methods=["GET"])
-
+    app.add_url_rule("/sociedad/pdf/<id>", "obtener_pdf_sociedad", sociedad.obtener_pdf_sociedad,methods=["GET"])
     return app
 
 '''

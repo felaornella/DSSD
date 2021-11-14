@@ -8,6 +8,10 @@ import os
 import json
 import app.drive.GoogleDriveFlask as GD
 import base64
+from pathlib import Path
+
+def home():
+    return render_template("home.html")
 
 def nuevaPag():
     paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
@@ -253,28 +257,59 @@ def aceptar_solicitud():
 # redirect: true or false. false is the default value if the redirect parameter is not specified. It indicates that the service should not redirect to Bonita Applications (after a successful login) or to the login page (after a login failure).
 # redirectUrl: the URL of the page to be displayed after a succesful login. If it is specified, then the a redirection after the login will be performed even if the "redirect" parameter is not present in the request.
 # tenant: the tenant to log in to (optional for Enterprise and Performance editions, not supported for Community, Teamwork and Efficiency editions)
+def vista_sociedad(hash):
+    ## BUSCAR POR SOCIEDAD TODO
+    soc= Sociedad.buscarSociedadPorId(hash)
+    if soc is None:
+        flash("Sociedad no encontrada",category="error")
+        return redirect(url_for("home"))
 
+    return render_template("sociedad.html",sociedad=soc)
 def obtener_estatuo(id):
     soc= Sociedad.buscarSociedadPorId(id)
     if soc is None:
-        return jsonify({'msg':'Sociedad no encontrada'}),404,{'ContentType':"application/json"}
+        flash("Sociedad no encontrada",category="error")
+        return redirect(url_for("home"))
 
     filename = "estatuto_"+str(soc.id)+".pdf"# +"."+ file.filename.split(".")[-1]
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
     UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp', 'estatutos')
-    path= (os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
-    if not path.exists():
-        GD.bajar_acrchivo_por_nombre("estatuto_"+soc.id+'.pdf',"app/static/temp/estatutos/")
-        if not path.exists():
+    path= os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename)
+    print(path)
+    qr_path = Path(path)
+    if not qr_path.exists():
+        GD.bajar_acrchivo_por_nombre("estatuto_"+str(soc.id)+'.pdf',"app/static/temp/estatutos/")
+        if not qr_path.exists():
             print("no existe ni en drive")
             return jsonify({'msg':'Estatuto not found'}),404,{'ContentType':"application/json"}
 
-    return send_file('static\\temp\\estatutos\\estatuto_'+soc.id+'.pdf', mimetype='application/pdf')
+    return send_file('static\\temp\\estatutos\\estatuto_'+str(soc.id)+'.pdf', mimetype='application/pdf')
+
+def obtener_pdf_sociedad(id):
+    soc= Sociedad.buscarSociedadPorId(id)
+    if soc is None:
+        flash("Sociedad no encontrada",category="error")
+        return redirect(url_for("home"))
+
+    filename = "sociedad_"+str(soc.id)+".pdf"# +"."+ file.filename.split(".")[-1]
+    APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+    UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp', 'sociedades')
+    path= os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename)
+    qr_path = Path(path)
+    if not qr_path.exists():
+        GD.bajar_acrchivo_por_nombre("sociedad_"+str(soc.id)+'.pdf',"app/static/temp/sociedades/")
+        if not qr_path.exists():
+            print("no existe ni en drive")
+            return jsonify({'msg':'Sociedad not found'}),404,{'ContentType':"application/json"}
+
+    return send_file('static\\temp\\sociedades\\sociedad_'+str(soc.id)+'.pdf', mimetype='application/pdf')
+
 
 def generar_carpeta_virtual(id):
     soc= Sociedad.buscarSociedadPorId(id)
     if soc is None:
-        return jsonify({'msg':'Sociedad no encontrada'}),404,{'ContentType':"application/json"}
+        flash("Sociedad no encontrada",category="error")
+        return redirect(url_for("home"))
     
     # Si necesitas el estatuto usa el metodo obtener_estatuto, que te devuelve el file .
     # Aunque el estatuto es un pdf para mi tenes como que poner un link que te deje obtener el estatuto. Con la ruta 
@@ -293,7 +328,7 @@ def generar_carpeta_virtual(id):
     
     # Generate PDF from render template hola.html
      
-    html = render_template('hola.html',sociedad=soc)
+    html = render_template('sociedad.html',sociedad=soc)
     
     result = open("app/static/temp/sociedades/sociedad_"+str(soc.id)+".pdf","w+b")
 
