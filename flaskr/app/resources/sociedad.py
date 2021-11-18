@@ -233,11 +233,15 @@ def login():
         return redirect(url_for("login_page"))
 
 def menu_mesaEntrada():
+    #session["tipo_user"]=1
+    #session["id_usuario"]=1
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
         return redirect(url_for("login_page"))
     return render_template("menu_mesa_de_entrada.html")
 
 def menu_legales():
+    #session["tipo_user"]=2
+    #session["id_usuario"]=1
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=2):
         return redirect(url_for("login_page"))
     return render_template("menu_area_de_legales.html")
@@ -245,26 +249,35 @@ def menu_legales():
 def evaluar_solicitudes():
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
         return redirect(url_for("login_page"))
-
-    
-
     socis= Sociedad.all()
     sociedades=[]
     for each in socis:
-        if(each.estado=="Esperando Confirmacion"):
+        if(each.estado==0):
             soci={}
             soci["sociedad"]=each
             soci["paises"]=each.paises.split(",")
             sociedades.append(soci)
     return render_template("evaluar_solicitudes.html",sociedades=sociedades)
 
+def evaluar_estatutos():
+    if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=2):
+        return redirect(url_for("login_page"))
+    socis= Sociedad.all()
+    sociedades=[]
+    for each in socis:
+        if(each.estado==0):
+            soci={}
+            soci["sociedad"]=each
+            soci["paises"]=each.paises.split(",")
+            sociedades.append(soci)
+    return render_template("evaluar_solicitudes.html",sociedades=sociedades)
 
 def rechazar_solicitud():
     data= request.get_json(force=True)
 
 
     socis= Sociedad.buscarSociedadPorId(data["solicitudId"])
-    socis.estado="Esperando Correccion"
+    socis.estado=1
     socis.save()
     activityId= bonita.searchActivityByCase(socis.caseId)
 
@@ -279,7 +292,7 @@ def rechazar_solicitud():
 def aceptar_solicitud():
     data= request.get_json(force=True)
     socis= Sociedad.buscarSociedadPorId(data["solicitudId"])
-    socis.estado="Esperando Evaluacion Estatuto"
+    socis.estado=2
     socis.save()
     activityId= bonita.searchActivityByCase(socis.caseId)
     bonita.setVariable(socis.caseId,"solicitudValido","true","java.lang.Boolean")

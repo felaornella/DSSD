@@ -22,7 +22,7 @@ class Sociedad(db.Model):
 
     socios = db.relationship("Socio", secondary=association_table,lazy='subquery', backref=db.backref('sociedad', lazy=True))
     caseId=  db.Column(db.Integer(),nullable=True) 
-    estado =  db.Column(db.String(255),nullable=True)                                   
+    estado =  db.Column(db.Integer(),nullable=True)                                   
     hash = db.Column(db.String(255),nullable=True)
 
     
