@@ -4,6 +4,7 @@ from werkzeug.utils import redirect
 import app.helpers.bonita as bonita
 from app.models.sociedad import Sociedad
 from app.models.socio import Socio
+from app.models.usuario import Usuario
 import os
 import json
 import app.drive.GoogleDriveFlask as GD
@@ -14,16 +15,19 @@ def home():
     return render_template("home.html")
 
 def nuevaPag():
-    paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
+    if session.get("email_user"):
+        paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
 
-    nomPaises=[]
+        nomPaises=[]
 
-    for each in paises:
-        nomPaises.append(each["name"])
+        for each in paises:
+            nomPaises.append(each["name"])
 
-    nomPaises.sort()
-   
-    return render_template("form_sociedad_anonima.html",paises=nomPaises)
+        nomPaises.sort()
+    
+        return render_template("form_sociedad_anonima.html",paises=nomPaises)
+    else:
+        return redirect(url_for("login_apoderado"))
 
 def nueva():
     data= request.form.to_dict()
@@ -127,6 +131,36 @@ def guardarEnBonita(id,emailApoderado):
     #bonita.completeActivity(activityId)
     #return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
 
+def login_general_page():
+    if ("email_user" in session):
+        return redirect(url_for("nueva_sa"))
+    return render_template("login_apoderado.html")
+
+def login_general():
+    data = request.form
+    if Usuario.autenticar(data["email"],data["pass"]):
+        session["email_user"]=data["email"]
+        return redirect(url_for("nueva_sa"))
+    else:
+        flash("Usuario o contraseña incorrectos.",category="error")
+        return redirect(url_for("login_apoderado"))
+
+
+def register_general_page():
+    if ("email_user" in session):
+        return redirect(url_for("nueva_sa"))
+    return render_template("register_apoderado.html")
+
+def register_general():
+    data = request.form
+    if Usuario.crearNuevo(data["email"],data["pass"], data["nombre"], data["apellido"], data["dni"]) is not None:
+        session["email_user"]=data["email"]
+        return redirect(url_for("nueva_sa"))
+    else:
+        flash("Datos incorrectos.",category="error")
+        return redirect(url_for("register_apoderado"))
+
+
 
 def loginPage():
     if ("tipo_user" in session):
@@ -138,6 +172,16 @@ def loginPage():
             logout()
     return render_template("login.html")
 
+
+def logout_general():
+    if session.get("email_user"):
+        temp=[]
+        for each in session:
+            temp.append(each)
+        for each in temp:
+            if each != "_permanent":
+                del session[each]
+    return redirect(url_for("login_apoderado"))
 def logout():
     if session.get("id_usuario"):
         temp=[]

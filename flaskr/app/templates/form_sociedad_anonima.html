@@ -108,8 +108,11 @@
       
 
     </div>
-  </div>
-
+</div>
+<br>
+<div style="width: 100%; height: 3.5rem; background-color: rgba(255,255,255,.5); text-align: center; padding-top: 1rem;">
+  <div>Autenticado como <strong>{{session.email_user}}</strong>  -  <a href="/logout">Cerrar Sesión</a></div>
+</div>
 {% endblock %}
 {% block scripts %}
   <script src="{{url_for('static',filename='form_sociedad_anonima.js')}}"></script>
