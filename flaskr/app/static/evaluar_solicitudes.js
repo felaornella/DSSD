@@ -12,7 +12,8 @@ for (let i=1; i<=count_soc;i++){
 
 function visualizarPDF(){
   console.log("Necesito la URL de  " + $(this).data("idsol"))
-  //actualizar url del modal
+  //actualizar src del modal
+  $("#embed-pdf").attr("src","/estatutos/"+$(this).data("idsol"))
   //$("#myModal").children()[0].children[0].children[1].children[0].setAttribute("src","https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf")
   $("#nombreSociedadVisualizando").text("Sociedad " + $(this).data("idsol"))
   $("#myModal").modal("show")

@@ -271,7 +271,7 @@ def evaluar_estatutos():
     socis= Sociedad.all()
     sociedades=[]
     for each in socis:
-        if(each.estado==0):
+        if(each.estado==2):
             soci={}
             soci["sociedad"]=each
             soci["paises"]=each.paises.split(",")
