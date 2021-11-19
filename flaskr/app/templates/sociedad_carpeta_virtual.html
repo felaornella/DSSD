@@ -1,0 +1,81 @@
+
+<html>
+<head>
+    <link href="../static/bootstrap.min.css"
+    rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  
+
+<div class="container" id="solicitudDiv{{sociedad.id}}">
+    <div class="card">
+        <h5 class="card-header text-center">{{sociedad.nombre}}</h5>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-9" style="text-align: left;">
+                    <div class="row">
+                        <div class="col-12"> 
+                            <p class="h5">Fecha Creacion: </p>
+                            <p class="ml-2 h6 text-muted">{{sociedad.fechaCreacion.strftime("%d/%m/%Y")}}</p>                            
+                        </div>
+                        <div class="col-12"> 
+                            <p class="h5">Correo Apoderado: </p>
+                            <p class="ml-2 h6 text-muted">{{sociedad.correoApoderado}}</p>
+                        </div>
+                        <div class="col-6">
+                            <p class="h5">Domicilio Legal</p>
+                            <p class="ml-2 h6 text-muted">{{sociedad.domicilioLegal}}</p>
+                        </div>
+                        <div class="col-6">
+                            <p class="h5">Domicilio Real</p>
+                            <p class="ml-2 h6 text-muted">{{sociedad.domicilioReal}}</p>
+                        </div>                                 
+                        <div class="col-12"> 
+                            <p class="h5">Paises a Exportar: </p>
+                            <p class="ml-2 h6 text-muted">{{sociedad.paises}}</p>
+                        </div>
+                        <div class="col-12">
+                        <p class="h5">Listado de Socios</p>
+                        <div class="row" style="padding-left: 15px;">
+                            <div class="col">
+                                <ul>
+                                    {%for each in sociedad.socios%}
+                                    <li>
+                                        <div class="row">    
+                                            <div class="col-5 mr-5">
+                                                {{each.apellido}}, {{each.nombre}} 
+                                                {%if each.apoderado %}
+                                                    <span class="badge badge-primary badge-pill">Apoderado</span>
+                                                {%endif%}
+                                            </div>
+                                            <div class="col-4">
+                                                {{each.porcentaje}}%
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {%endfor%}
+                                </ul>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3 justify-center">
+                    <img src="http://localhost:5000/qr/{{sociedad.id}}" class="img-fluid" alt="QR de sociedad {{sociedad.id}}">
+                    <div class="d-flex justify-content-center text-center">
+                        <a  class="btn btn-info" href="{{ url_for('obtener_estatuto',id=sociedad.id)}}"> Estatuto </a>                        
+                    </div>
+                    <div class="d-flex justify-content-center text-center mt-2">
+                        <a  class="btn btn-info" href="{{ url_for('obtener_pdf_sociedad',id=sociedad.id)}}"> Pdf </a>                        
+                    </div>
+
+                </div>
+            
+            </div>
+        </div>
+      </div>
+</div>
+
+</body>
+</html>

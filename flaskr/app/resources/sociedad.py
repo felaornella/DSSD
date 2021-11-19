@@ -1,4 +1,4 @@
-from flask import Response,jsonify, render_template, request, session, url_for, flash ,send_file
+from flask import Response,jsonify, render_template, request, session, url_for, flash ,send_file , make_response
 import requests
 from werkzeug.utils import redirect
 import app.helpers.bonita as bonita
@@ -14,20 +14,26 @@ from pathlib import Path
 def home():
     return render_template("home.html")
 
-def nuevaPag():
-    if session.get("email_user"):
-        paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
+def getPaises():
+    #With GraphQL
+    url = "https://countries.trevorblades.com/"
 
-        nomPaises=[]
+    payload = json.dumps({
+    "query": "{ continents  {  	code,  	name,  countries{  name,    code  } }}"
+    })
+    headers = {
+    'Content-Type': 'application/json'
+    }
 
-        for each in paises:
-            nomPaises.append(each["name"])
-
-        nomPaises.sort()
+    response = requests.request("POST", url, headers=headers, data=payload).json()
     
-        return render_template("form_sociedad_anonima.html",paises=nomPaises)
-    else:
-        return redirect(url_for("login_apoderado"))
+    return response
+
+def nuevaPag():
+    paises= getPaises()["data"]
+    #paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
+    
+    return render_template("form_sociedad_anonima.html",paises=paises)
 
 def nueva():
     data= request.form.to_dict()
@@ -54,12 +60,12 @@ def nueva():
     #print(sociedad.id)
     file = request.files['estatuto']
     if file:
-        filename = "estatuto_"+str(sociedad.id)# +"."+ file.filename.split(".")[-1]
+        filename = "estatuto_"+str(sociedad.id)+".pdf"# +"."+ file.filename.split(".")[-1]
         APP_ROOT = os.path.dirname(os.path.abspath(__file__))
         
         UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp','estatutos')
         file.save(os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
-        GD.subir_archivo("app/static/temp/estatutos/estatuto_"+id+".pdf",GD.folder_estatuto)
+        GD.subir_archivo("app/static/temp/estatutos/estatuto_"+str(sociedad.id)+".pdf",GD.folder_estatuto)
         # UPLOAD_FOLDER = url_for("static",filename= "")
         # file.save((UPLOAD_FOLDER+filename))
         
@@ -375,13 +381,11 @@ def generar_carpeta_virtual(id):
     
     
     # obtener_qr(soc.id)   HAY QUE VER QUE TE DEVUELVE Y SI TE SIRVE
-    
-     
-
+   
     # Generar PDF con el estatuo y guardarlo esn static/temp/sociedades/sociedad_{hash}.pdf
     from io import BytesIO, StringIO
     from xhtml2pdf import pisa
-    from flask import  render_template
+    
     
     # Generate PDF from render template hola.html
      
@@ -403,3 +407,5 @@ def generar_carpeta_virtual(id):
     #GD.subir_archivo2("sociedad_"+soc.hash+".pdf",pdf,GD.folder_sociedades)
     # El pdf de la sociedad ya esta arriba en la nube 
     return jsonify({'msg':'Carpeta virtual creada'}),200,{'ContentType':"application/json"}
+
+

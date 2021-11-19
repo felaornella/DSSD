@@ -60,9 +60,11 @@
             <label class='col-sm-2 col-form-label' for="paisesExportacion">Países y estados a los que exporta </label>
             <div class="col-sm-10">
                 <select multiple  class="selectpicker col-10" id="paisesExportacion" name="paisesExportacion">
-                  {% for each in paises %}
-                    {{each}}
-                    <option value="{{each}}"> {{each}} </option>
+                  {% for continente in paises.continents %}
+                    
+                    {% for pais in continente.countries %}
+                      <option value="{{continente.code}}-{{pais.name}}"> {{pais.name}} </option>
+                    {% endfor %}
                   {% endfor %}
                 </select>
             </div>
