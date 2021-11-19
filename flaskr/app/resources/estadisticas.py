@@ -56,3 +56,7 @@ def get_estadisticas_paises():
     continentes_estadisticas = sorted(continentes_estadisticas2.items(), key=lambda x: x[1], reverse=True)
     return render_template('estadisticas.html', paises_estadisticas=paises_estadisticas, continentes_estadisticas=continentes_estadisticas)
     # Get estadisticas de paises de la sociedades
+
+def get_metricas():
+
+    return render_template('metricas.html',cantidad_procesos_activos=10,cantidad_procesos_finalizados=4)

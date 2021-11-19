@@ -80,6 +80,7 @@ def create_app(environment="development"):
     app.add_url_rule("/generar-carpeta-virtual/<id>", "generar_carpeta_virtual", sociedad.generar_carpeta_virtual,methods=["GET"])
     app.add_url_rule("/sociedad/pdf/<id>", "obtener_pdf_sociedad", sociedad.obtener_pdf_sociedad,methods=["GET"])
     app.add_url_rule("/gerencia/estadisticas", "estadisticas", estadisticas.get_estadisticas_paises,methods=["GET"])
+    app.add_url_rule("/gerencia/metricas", "metricas", estadisticas.get_metricas,methods=["GET"])
     return app
 
 '''
