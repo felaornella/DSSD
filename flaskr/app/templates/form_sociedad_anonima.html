@@ -63,7 +63,7 @@
                   {% for continente in paises.continents %}
                     
                     {% for pais in continente.countries %}
-                      <option value="{{continente.code}}-{{pais.name}}"> {{pais.name}} </option>
+                      <option value="{{pais.name}}({{continente.code}})"> {{pais.name}} </option>
                     {% endfor %}
                   {% endfor %}
                 </select>

@@ -113,8 +113,8 @@
                                         </div>
                                         <div class="row">
                                             <div class="col" style="margin: 0; text-align: left;"> 
-                                                <span style="margin-left: 1rem; font-weight: bold;">Paises a Exportar</span><br>
-                                                <span style="margin-left: 1.5rem;">{{sociedad.sociedad.paises}}</span>
+                                                <span style="margin-left: 1rem; font-weight: bold;">Paises que exporta</span><br>
+                                                <div style="margin-left: 1.5rem;">{% autoescape false %}{{sociedad.sociedad.paises | replace(",", "<br>") }}{% endautoescape %}</div>
                                             </div>
                                         </div>
                                     </div>

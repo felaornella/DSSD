@@ -9,8 +9,8 @@ from app.db_sqlalchemy import db_sqlalchemy
 from flask_bootstrap import Bootstrap
 from flask_cors import CORS
 
-from app.resources import sociedad
-from app.resources import qr
+from app.resources import sociedad,estadisticas,qr
+
 
 #va development
 def create_app(environment="development"):
@@ -79,6 +79,7 @@ def create_app(environment="development"):
     app.add_url_rule("/estatutos/<id>", "obtener_estatuto", sociedad.obtener_estatuo,methods=["GET"])
     app.add_url_rule("/generar-carpeta-virtual/<id>", "generar_carpeta_virtual", sociedad.generar_carpeta_virtual,methods=["GET"])
     app.add_url_rule("/sociedad/pdf/<id>", "obtener_pdf_sociedad", sociedad.obtener_pdf_sociedad,methods=["GET"])
+    app.add_url_rule("/gerencia/estadisticas", "estadisticas", estadisticas.get_estadisticas_paises,methods=["GET"])
     return app
 
 '''
