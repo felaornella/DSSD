@@ -233,15 +233,15 @@ def login():
         return redirect(url_for("login_page"))
 
 def menu_mesaEntrada():
-    #session["tipo_user"]=1
-    #session["id_usuario"]=1
+    session["tipo_user"]=1
+    session["id_usuario"]=1
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
         return redirect(url_for("login_page"))
     return render_template("menu_mesa_de_entrada.html")
 
 def menu_legales():
-    #session["tipo_user"]=2
-    #session["id_usuario"]=1
+    session["tipo_user"]=2
+    session["id_usuario"]=1
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=2):
         return redirect(url_for("login_page"))
     return render_template("menu_area_de_legales.html")
@@ -270,7 +270,7 @@ def evaluar_estatutos():
             soci["sociedad"]=each
             soci["paises"]=each.paises.split(",")
             sociedades.append(soci)
-    return render_template("evaluar_solicitudes.html",sociedades=sociedades)
+    return render_template("evaluar_estatutos.html",sociedades=sociedades)
 
 def rechazar_solicitud():
     data= request.get_json(force=True)
