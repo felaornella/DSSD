@@ -72,7 +72,7 @@
                 </h4>            </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                     <div class="card">
                         <div class="card-body">
                         <h5 class="card-title">Cantidad de procesos activos</h5>
@@ -80,7 +80,7 @@
                         </div>
                     </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Cantidad de procesos finalizados</h5>
@@ -88,6 +88,35 @@
                         </div>
                     </div>
                     </div>
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Cantidad de procesos fallidas</h5>
+                                <h4 class="card-text text-muted">{{cantidad_procesos_fallidos}}</h4> 
+                            </div>
+                        </div>
+                        </div>
+                    <!-- Division con titulo "Cantidad de procesos en cada etapa"-->
+                    
+                    <div class="col-sm-12 m-4">
+                        <h4>Cantidad de procesos en cada etapa</h4>
+                    </div>
+                    <!-- Si no hay metricas mostrar mensaje de no se encuentra ningun proceso activo-->
+                    {% if metrics is defined and not metrics|length > 0 %}
+                        <div class="col-sm-12 mr-4 ml-4">
+                            <h5 class="text-muted">No se encontraron procesos activos</h5>
+                        </div>
+                    {% endif %}
+                    {% for key, value in metrics %}
+                        <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{key}}</h5>
+                                <h4 class="card-text text-muted">{{value}}</h4> 
+                            </div>
+                        </div>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
           </div>

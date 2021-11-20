@@ -51,3 +51,37 @@ def checkRole(role,idUser):
             return True
     return False
     
+
+def getAllActivity():
+    body = {'username':"gerencia", 'password':"gerencia", 'redirect':'false'}
+  
+    res = requests.post('http://localhost:8080/bonita/loginservice', data=body,headers={"Content-Type" : "application/x-www-form-urlencoded"})
+    if res.status_code==200:
+        tokenbonita= res.cookies.get('X-Bonita-API-Token')
+        cookiesbonita = "JSESSIONID="+res.cookies.get('JSESSIONID')+";X-Bonita-API-Token="+res.cookies.get('X-Bonita-API-Token')
+        
+        url = "http://localhost:8080/bonita/API/bpm/activity"
+
+    
+        res= requests.get(url, params={"o":"last_update_date"} ,headers={"X-Bonita-API-Token":tokenbonita,"Cookie":cookiesbonita})
+    
+        return res.json()
+    return []
+
+def getAllCasesFinalizados():
+    body = {'username':"gerencia", 'password':"gerencia", 'redirect':'false'}
+  
+    res = requests.post('http://localhost:8080/bonita/loginservice', data=body,headers={"Content-Type" : "application/x-www-form-urlencoded"})
+    if res.status_code==200:
+        tokenbonita= res.cookies.get('X-Bonita-API-Token')
+        cookiesbonita = "JSESSIONID="+res.cookies.get('JSESSIONID')+";X-Bonita-API-Token="+res.cookies.get('X-Bonita-API-Token')
+        
+        url = "http://localhost:8080/bonita/API/bpm/archivedCase?o"
+
+    
+        res= requests.get(url ,headers={"X-Bonita-API-Token":tokenbonita,"Cookie":cookiesbonita})
+    
+        return res.json()
+    return []
+    
+
