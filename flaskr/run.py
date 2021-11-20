@@ -5,6 +5,8 @@ if __name__ == "__main__":
     
     #lanzar para toda la red wifi
     #app.run(host='192.168.0.14', port=5000)
-    login()
+    #
+    # =============================NO FUNCIONA =============================
+    #    login()
     #lanzar local
     app.run()
