@@ -58,5 +58,24 @@ def get_estadisticas_paises():
     # Get estadisticas de paises de la sociedades
 
 def get_metricas():
+    cant_fallidos=0
+    cant_activos=0
+    activitys= bonita.getAllActivity()
+    # count cant in array json from getAllCasesFinalizados
+    cant_finalizados= len(bonita.getAllCasesFinalizados())
 
-    return render_template('metricas.html',cantidad_procesos_activos=10,cantidad_procesos_finalizados=4)
+    # Analyze activitys and get metrics.
+    # Count how much activitys have each type (from value displayName)
+    metrics={}
+    for activity in activitys:
+        if activity['state'] == 'failed':
+            cant_fallidos += 1
+        else:
+            cant_activos += 1
+
+        if activity['displayName'] in metrics:
+            metrics[activity['displayName']] += 1
+        else:
+            metrics[activity['displayName']] = 1
+    
+    return render_template('metricas.html',cantidad_procesos_activos=cant_activos,cantidad_procesos_fallidos=cant_fallidos, cantidad_procesos_finalizados=cant_finalizados,metrics=metrics.items())

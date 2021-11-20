@@ -87,16 +87,17 @@ def estampillar(): #soc_id
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
     UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp', 'estatutos')
     path= (os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
-    if not path.exists():
+    path2 = Path(path)
+    if not path2.exists():
         GD.bajar_acrchivo_por_nombre("estatuto_"+id+'.pdf',"app/static/temp/estatutos/")
-        if not path.exists():
+        if not path2.exists():
             print("no existe ni en drive")
             return jsonify({'msg':'Estatuto not found'}),404,{'ContentType':"application/json"}
     
     with open(path, "rb") as pdf_file:
         encoded_string = base64.b64encode(pdf_file.read())
         
-    print(encoded_string)
+    #print(encoded_string)
     # cargar datos de sociedad y expediente
     datos= {
         "numeroExpediente": str(soc.id),
@@ -239,15 +240,11 @@ def login():
         return redirect(url_for("login_page"))
 
 def menu_mesaEntrada():
-    session["tipo_user"]=1
-    session["id_usuario"]=1
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
         return redirect(url_for("login_page"))
     return render_template("menu_mesa_de_entrada.html")
 
 def menu_legales():
-    session["tipo_user"]=2
-    session["id_usuario"]=1
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=2):
         return redirect(url_for("login_page"))
     return render_template("menu_area_de_legales.html")
