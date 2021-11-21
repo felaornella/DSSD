@@ -451,7 +451,9 @@ def generar_carpeta_virtual(id):
     
 
     # Generar carpeta virtual (Subir a drive)
-    GD.subir_archivo("app/static/temp/sociedades/sociedad_"+str(soc.id)+".pdf",GD.folder_sociedades)
+
+# COMENTARIO TEMPORAL==============================
+#    GD.subir_archivo("app/static/temp/sociedades/sociedad_"+str(soc.id)+".pdf",GD.folder_sociedades)
     # Version 2
     #pdf= None
     #GD.subir_archivo2("sociedad_"+soc.hash+".pdf",pdf,GD.folder_sociedades)
