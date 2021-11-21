@@ -189,6 +189,7 @@ def logout_general():
             if each != "_permanent":
                 del session[each]
     return redirect(url_for("login_apoderado"))
+
 def logout():
     if session.get("id_usuario"):
         temp=[]
@@ -214,6 +215,12 @@ def login():
         except:
             print("no pude levantar el id de area legales")
 
+        try:
+            r= requests.get("http://localhost:8080/bonita/API/identity/role?f=name=Gerencia",headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+            idGerencia=r.json()[0]["id"]
+        except:
+            print("no pude levantar el id de gerencia")    
+
         r = requests.get("http://localhost:8080/bonita/API/identity/user?f=userName=" + data["username"],headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
         idUser= r.json()[0]["id"]
         session["id_usuario"]=idUser
@@ -221,11 +228,14 @@ def login():
   
         mesaEntrada=False
         areaLegales=False
+        gerencia=False
         for each in r2.json():
             if not mesaEntrada and each["role_id"]==idMesa:                
                 mesaEntrada=True
             if not areaLegales and each["role_id"]==idLegales:
                 areaLegales=True
+            if not gerencia and each["role_id"]==idGerencia:
+                gerencia=True
        
         if (mesaEntrada):
             session["tipo_user"]=1
@@ -233,6 +243,9 @@ def login():
         elif areaLegales:
             session["tipo_user"]=2
             return redirect(url_for("menu_area_de_legales"))
+        elif gerencia:
+            session["tipo_user"]=3
+            return redirect(url_for("menu_gerencia"))
         else:
             return redirect(url_for("login_page"))
     else:
@@ -252,6 +265,15 @@ def menu_legales():
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=2):
         return redirect(url_for("login_page"))
     return render_template("menu_area_de_legales.html")
+
+
+def menu_gerencia():
+    session["tipo_user"]=3
+    session["id_usuario"]=1
+    if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=3):
+        return redirect(url_for("login_page"))
+    return render_template("menu_gerencia.html")
+
 
 def evaluar_solicitudes():
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
