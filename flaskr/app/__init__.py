@@ -72,6 +72,8 @@ def create_app(environment="development"):
     app.add_url_rule("/evaluar_estatutos", "evaluar_estatutos", sociedad.evaluar_estatutos,methods=["GET"])
     app.add_url_rule("/rechazar_solicitud", "rechazar_solicitud", sociedad.rechazar_solicitud,methods=["POST"])
     app.add_url_rule("/aceptar_solicitud", "aceptar_solicitud", sociedad.aceptar_solicitud,methods=["POST"])
+    app.add_url_rule("/rechazar_solicitud_estatuto", "rechazar_solicitud_estatuto", sociedad.rechazar_estatuto,methods=["POST"])
+    app.add_url_rule("/aceptar_solicitud_estatuto", "aceptar_solicitud_estatuto", sociedad.aceptar_estatuto,methods=["POST"])
     app.add_url_rule("/sociedad/<hash>", "vista_sociedad", sociedad.vista_sociedad,methods=["GET"])
     
     app.add_url_rule("/generar_qr/<id>", "generar_qr", qr.generar_qr,methods=["GET"])

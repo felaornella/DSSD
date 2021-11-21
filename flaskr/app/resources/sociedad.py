@@ -307,6 +307,33 @@ def aceptar_solicitud():
     bonita.completeActivity(activityId)
     return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
 
+def rechazar_estatuto():
+    data= request.get_json(force=True)
+
+    socis= Sociedad.buscarSociedadPorId(data["solicitudId"])
+    socis.estado=3
+    socis.save()
+    activityId= bonita.searchActivityByCase(socis.caseId)
+
+    bonita.setVariable(socis.caseId,"solicitudValido","false","java.lang.Boolean")
+    bonita.setVariable(socis.caseId,"comentarios",data["comentario"],"java.lang.String")
+
+    bonita.assignTask(activityId,session["id_usuario"])
+    bonita.completeActivity(activityId)
+    return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
+
+
+def aceptar_estatuto():
+    data= request.get_json(force=True)
+    socis= Sociedad.buscarSociedadPorId(data["solicitudId"])
+    socis.estado=4
+    socis.save()
+    activityId= bonita.searchActivityByCase(socis.caseId)
+    bonita.setVariable(socis.caseId,"solicitudValido","true","java.lang.Boolean")
+    bonita.assignTask(activityId,session["id_usuario"])
+    bonita.completeActivity(activityId)
+    return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
+
 # Authenticate to Bonita
 # To log in, use the following request:
 # Request URL
