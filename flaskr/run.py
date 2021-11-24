@@ -7,6 +7,6 @@ if __name__ == "__main__":
     #app.run(host='192.168.0.14', port=5000)
     #
     # =============================NO FUNCIONA =============================
-    #    login()
+    login()
     #lanzar local
     app.run()

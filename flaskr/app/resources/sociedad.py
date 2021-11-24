@@ -10,6 +10,8 @@ import json
 import app.drive.GoogleDriveFlask as GD
 import base64
 from pathlib import Path
+import datetime
+from cryptography.fernet import Fernet
 
 def home():
     return render_template("home.html")
@@ -28,7 +30,65 @@ def getPaises():
     response = requests.request("POST", url, headers=headers, data=payload).json()
     
     return response
+def editarPag(hash):
+    
+    id= deshashear(int(hash))
+    print(id)
+    paises= getPaises()["data"]
+    soc= Sociedad.buscarSociedadPorId(id)
+    
+    if not soc:
+        return redirect(url_for("home"))
+    socios= soc.socios
+    aux=[]
+    for soci in socios:
+        aux.append({"porcentaje":soci.porcentaje, "nombreSocioNuevo":soci.nombre,"apellidoSocioNuevo":soci.apellido})
+    print(socios)
+    print(aux)
+    #paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
+    
+    return render_template("form_edit_sociedad_anonima.html",soc_id=hash,socios=aux,paises=paises,nombre=soc.nombre, fecha= soc.fechaCreacion,seleccionados=soc.paises.split(","),email= soc.correoApoderado, real=soc.domicilioReal, legal=soc.domicilioLegal)
+def guardarEdicion(hash):
+    id= deshashear(int(hash))
+    data= request.form.to_dict()
+    file= request.files['estatuto']
+    sociedad= Sociedad.buscarSociedadPorId(id)
+    #Buscar sociedad vieja y editarla
 
+    sociedad.nombre =data["nombreSociedad"]
+    sociedad.fechaCreacion =data["fechaCreacion"]
+    sociedad.domicilioLegal =data["domicilioLegal"]
+    sociedad.domicilioReal =data["domicilioReal"]
+    sociedad.correoApoderado =data["email"]
+    sociedad.paises =data["paisesExpo"]
+    sociedad.estado ="Esperando Confirmacion"
+    
+    #eliminar socios
+    for socio in sociedad.socios:
+        socio.delete()
+    for each in json.loads(data["socios"]).values():
+        soc = Socio(each["nombre"],each["apellido"],each["porcentaje"],each["apoderado"])
+        sociedad.socios.append(soc)
+
+    
+    
+    sociedad.save()
+    if file:
+        #borrar file vieja
+        file = request.files['estatuto']
+        if file:
+            filename = "estatuto_"+str(sociedad.id)+".pdf"# +"."+ file.filename.split(".")[-1]
+            APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+            
+            UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp','estatutos')
+            file.save(os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
+            GD.subir_archivo("app/static/temp/estatutos/estatuto_"+str(sociedad.id)+".pdf",GD.folder_estatuto)
+            # UPLOAD_FOLDER = url_for("static",filename= "")
+            # file.save((UPLOAD_FOLDER+filename))
+            
+
+    
+    return Response(status=200)
 def nuevaPag():
     paises= getPaises()["data"]
     #paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
@@ -66,8 +126,7 @@ def nueva():
         UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp','estatutos')
         file.save(os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
         GD.subir_archivo("app/static/temp/estatutos/estatuto_"+str(sociedad.id)+".pdf",GD.folder_estatuto)
-        # UPLOAD_FOLDER = url_for("static",filename= "")
-        # file.save((UPLOAD_FOLDER+filename))
+
         
     bonita.setVariable(caseId,"emailApoderado",sociedad.correoApoderado,"java.lang.String")
     bonita.setVariable(caseId,"idSolicitud",sociedad.id,"java.lang.String")
@@ -167,8 +226,12 @@ def register_general():
         flash("Datos incorrectos.",category="error")
         return redirect(url_for("register_apoderado"))
 
-
-
+hashnum= 968532556
+def hashear(num):
+    return int(num)+hashnum
+def deshashear(num):
+    return int(num)-hashnum
+    
 def loginPage():
     if ("tipo_user" in session):
         if session["tipo_user"]==1:

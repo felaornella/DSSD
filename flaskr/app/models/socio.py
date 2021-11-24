@@ -29,6 +29,10 @@ class Socio(db.Model):
         db.session.add(self)
         db.session.commit()
         return True
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return True
 
     def __repr__(self):
         return '<Socio Object>'
@@ -38,3 +42,6 @@ class Socio(db.Model):
     def buscarTurno_FinalPorID(id):
         turno = Socio.query.filter_by(id=id).first()
         return turno
+    # def buscarSociosDeSociedad(id):
+        # turno = Socio.query.filter_by(id=id)
+        # return turno

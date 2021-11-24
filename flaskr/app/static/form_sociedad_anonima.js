@@ -94,6 +94,55 @@ function agregarSocio() {
 
     bloqueoCampos()
 }
+function agregarSocioParams(porcentaje, apellidoSocioNuevo,nombreSocioNuevo) {
+    porcentajeTot = porcentajeTot + porcentaje
+    sociosCount=sociosCount+1
+
+    var nombre = apellidoSocioNuevo + ", " + nombreSocioNuevo
+    var porciento = porcentaje
+
+    var socio = document.createElement("p")
+    socio.innerText= nombre + " - " + porciento + "%"
+    socio.setAttribute("style","margin-bottom: 0; font-size:1.25rem")
+
+
+    var colSocio= document.createElement("div")
+    colSocio.setAttribute("class","col-8")
+    colSocio.setAttribute("style","text-align:left")
+    
+    var colButton= document.createElement("div")
+    colButton.setAttribute("class","col-3")
+    
+    var button= document.createElement("button")
+    button.innerText="X"
+    button.setAttribute("class","btn btn-outline-danger")
+    button.setAttribute("id","buttonSocio"+ sociosCount)
+    
+    colButton.appendChild(button)
+    colSocio.appendChild(socio)
+    
+    var socioEntero = document.createElement("div")
+    socioEntero.setAttribute("class","row  align-items-center")
+    socioEntero.setAttribute("style","margin-bottom:1rem; border-bottom: 1.5px solid rgba(0,0,0,0.25); padding-bottom:.5rem")
+    socioEntero.setAttribute("id","socio"+sociosCount)
+    socioEntero.setAttribute("perc",porciento)
+    socioEntero.setAttribute("nombre", nombreSocioNuevo)
+    socioEntero.setAttribute("apellido",apellidoSocioNuevo)
+    socioEntero.appendChild(colSocio)
+    socioEntero.appendChild(colButton)
+
+    listadoSocios.prepend(socioEntero)
+    
+    agregarASelect(nombre, porciento,socioEntero.getAttribute("id"))
+
+    $("#buttonSocio"+sociosCount).on("click",()=>{quitar(socioEntero.getAttribute("id"))})
+
+    $("#nombreSocioNuevo").val("")
+    $("#apellidoSocioNuevo").val("")
+    $("#porcentaje").val("")
+
+    bloqueoCampos()
+}
 
 function agregarASelect(name, perc, id){
     if (sociosEnSelect == 0){

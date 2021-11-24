@@ -1,0 +1,183 @@
+{% extends "layout.html" %}
+{% block title %}Sociedad anonima{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+<div class="card container" style="background-color: rgba(255,255,255,.5);">
+    <div class="card-header">
+      <h1>Registre una S.A.</h1>
+    </div>
+    <div class="card-body">
+      <form id="formulario">
+        
+
+    
+        <div class="form-group row">
+          <label class='col-sm-2 col-form-label' for="nombreSociedad">Nombre de la Sociedad Anonima: </label>
+          <div class="col-sm-10">
+              <input class="form-control"  type="text" id="nombreSociedad" name="nombreSociedad" {% if nombre %} value ={{nombre}}{% endif %}>
+          </div>
+        </div>
+        
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="fechaCreacion">Fecha de creacion de la Sociedad Anonima: </label>
+            <div class="col-sm-10">
+                <input class="form-control" type="date" id="fechaCreacion" name="fechaCreacion" {% if fecha%} value ={{fecha}}{% endif %}>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="estatuto">Cambiar estatuto de conformación firmado por escribano público: </label>
+            <div class="col-sm-10">
+                <input class="form-control" type="file" accept=".docx,.odt,.pdf" id="estatuto" name="estatuto" style="padding-top: .2rem;">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="domicilioLegal">Domicilio Legal: </label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="domicilioLegal" name="domicilioLegal" {% if legal%} value ={{legal}}{% endif %}>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="domicilioReal">Domicilio Real: </label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="domicilioReal" name="domicilioReal" {% if real%} value ={{real}}{% endif %}>
+            </div>
+        </div>
+        
+        
+    
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="email">Correo Electrónico (del apoderado): </label>
+            <div class="col-sm-10">
+                <input class="form-control" type="email" id="email" name="email" {% if email%} value ={{email}}{% endif %}>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class='col-sm-2 col-form-label' for="paisesExportacion">Países y estados a los que exporta </label>
+            <div class="col-sm-10">
+                <select multiple  class="selectpicker col-10" id="paisesExportacion" name="paisesExportacion">
+                  {% for continente in paises.continents %}
+                    
+                    {% for pais in continente.countries %}
+                      <option value="{{pais.name}}({{continente.code}})" {% if pais.name in seleccionados %} selected=true {% endif %}> {{pais.name}} </option>
+                    {% endfor %}
+                  {% endfor %}
+                </select>
+            </div>
+        </div>
+        <!-- Nombre de la Sociedad
+        ● Fecha de creación
+        ● Socios, de los cuales se registra Apellido, nombres y porcentaje de aportes realizados
+        (entre todos debe llegar al 100%)
+        ● Estatuto de conformación firmado por escribano público (Se adjunta un documento
+        .docx, odt, pdf).
+        ● Domicilio Legal
+        ● Domicilio Real
+        ● Representante Legal o Apoderado (Uno de los socios con mayor porcentaje. La
+        aplicación puede sugerir uno de los socios ingresados, permitiendo luego modificarlo)
+        ● Correo Electrónico (del apoderado)
+        ● Países y estados a los que exporta (En caso de no exportar el país será Argentina) -->
+
+        <div class="row" style="background-color: rgba(0,0,0,0.15); padding: 1rem; border-radius: .25rem; margin:1px">
+          <div class="col-4">
+            <input class="form-control" type="text" placeholder="Nombre Socio" id="nombreSocioNuevo"><br>
+            <input class="form-control" type="text" placeholder="Apellido Socio" id="apellidoSocioNuevo"><br>
+            <input class="form-control" type="number" placeholder="Porcentaje Socio" id="porcentaje"><br>
+            <button type="button" class="btn btn-primary" id="buttonAddSocioNuevo" style="width: 60%; margin-left: 20%; margin-right: 20%;">Agregar</button>
+          </div>
+          <div class="col-8" >
+            <div id="selectApoderado">
+              <select class="form-control" id="apoderado" disabled>
+                <option value="-1" perc="-1" id="optionNoData">No hay datos para seleccionar</option>
+              </select>
+            </div>
+            <div id="bloqueListado" style="margin-top: 1rem; overflow-y: auto; overflow-x: hidden; max-height: 15rem;">
+
+            </div>
+          </div>
+          
+        </div>
+        <br>
+        <div class="col-md-12">
+            <button type="button" id="buttonEnviarForm" class="btn btn-primary btn-block">Guardar</button>
+        </div>
+         <br>
+      </form>
+      
+
+    </div>
+</div>
+<br>
+<div style="width: 100%; height: 3.5rem; background-color: rgba(255,255,255,.5); text-align: center; padding-top: 1rem;">
+  <div>Autenticado como <strong>{{session.email_user}}</strong>  -  <a href="/logout">Cerrar Sesión</a></div>
+</div>
+{% endblock %}
+{% block scripts %}
+  <script src="{{url_for('static',filename='form_editar_sociedad_anonima.js')}}"></script>
+  <script>
+	var sociedad_id= {{soc_id}}
+	{%if socios%}
+	var sociosCount=0
+	var porcentajeTot=0
+
+	var sociosEnSelect=0
+
+	var maxPerc = 0
+	var listadoSocios = $("#bloqueListado")
+	var selectSocios = document.getElementById("apoderado")
+	{%endif%}
+	{% for soc in socios %}
+	
+	porcentajeTot = porcentajeTot + {{soc.porcentaje}}
+    sociosCount=sociosCount+1
+
+    var nombre = "{{soc.apellidoSocioNuevo}}" + ", " + "{{soc.nombreSocioNuevo}}"
+    var porciento = {{soc.porcentaje}}
+
+    var socio = document.createElement("p")
+    socio.innerText= nombre + " - " + porciento + "%"
+    socio.setAttribute("style","margin-bottom: 0; font-size:1.25rem")
+
+
+    var colSocio= document.createElement("div")
+    colSocio.setAttribute("class","col-8")
+    colSocio.setAttribute("style","text-align:left")
+    
+    var colButton= document.createElement("div")
+    colButton.setAttribute("class","col-3")
+    
+    var button= document.createElement("button")
+    button.innerText="X"
+    button.setAttribute("class","btn btn-outline-danger")
+    button.setAttribute("id","buttonSocio"+ sociosCount)
+    
+    colButton.appendChild(button)
+    colSocio.appendChild(socio)
+    
+    var socioEntero = document.createElement("div")
+    socioEntero.setAttribute("class","row  align-items-center")
+    socioEntero.setAttribute("style","margin-bottom:1rem; border-bottom: 1.5px solid rgba(0,0,0,0.25); padding-bottom:.5rem")
+    socioEntero.setAttribute("id","socio"+sociosCount)
+    socioEntero.setAttribute("perc",porciento)
+    socioEntero.setAttribute("nombre", "{{soc.nombreSocioNuevo}}")
+    socioEntero.setAttribute("apellido","{{soc.apellidoSocioNuevo}}")
+    socioEntero.appendChild(colSocio)
+    socioEntero.appendChild(colButton)
+
+    listadoSocios.prepend(socioEntero)
+    
+    agregarASelect(nombre, porciento,socioEntero.getAttribute("id"))
+
+    $("#buttonSocio"+sociosCount).on("click",()=>{quitar(socioEntero.getAttribute("id"))})
+
+    $("#nombreSocioNuevo").val("")
+    $("#apellidoSocioNuevo").val("")
+    $("#porcentaje").val("")
+    bloqueoCampos()
+	{% endfor %}
+  </script>
+{% endblock %}
