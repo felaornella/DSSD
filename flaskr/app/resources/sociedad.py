@@ -4,14 +4,11 @@ from werkzeug.utils import redirect
 import app.helpers.bonita as bonita
 from app.models.sociedad import Sociedad
 from app.models.socio import Socio
-from app.models.usuario import Usuario
 import os
 import json
 import app.drive.GoogleDriveFlask as GD
-import base64
 from pathlib import Path
-import datetime
-from cryptography.fernet import Fernet
+from xhtml2pdf import pisa
 import re
 
 def home():
@@ -50,6 +47,7 @@ def editarPag(hash):
     if (soc.estado!=1 and soc.estado!=3):
         flash("La sociedad esta en estado de evaluacion.",category="error")
         return redirect(url_for("home"))
+    bonita.autenticion('solicitante.general','solicitante')
     if (bonita.searchActivityByCase(soc.caseId) == None):
         flash("Paso el limite de tiempo para editar. Debe iniciar el proceo devuelta",category="error")
         return redirect(url_for("home"))
@@ -58,8 +56,7 @@ def editarPag(hash):
     aux=[]
     for soci in socios:
         aux.append({"porcentaje":soci.porcentaje, "nombreSocioNuevo":soci.nombre,"apellidoSocioNuevo":soci.apellido,'apoderado':soci.apoderado})
-    #paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
-    print(soc.estado)
+    
     return render_template("form_edit_sociedad_anonima.html",estado=soc.estado,soc_id=hash,socios=aux,paises=paises,nombre=soc.nombre, fecha= soc.fechaCreacion,seleccionados=soc.paises.split(","),email= soc.correoApoderado, real=soc.domicilioReal, legal=soc.domicilioLegal)
 
 
@@ -83,7 +80,19 @@ def guardarEdicion(hash):
         return jsonify({'msg':'No tenes acceso para editar esto'}),400,{'ContentType':"application/json"}
     #Buscar sociedad vieja y editarla
     print(json.loads(data["socios"]).values())
-    if (json.loads(data["socios"]).values().__len__()==0):
+    # Check all fields are filled in data and return especific error if not
+    if ("nombreSociedad" in data and data["nombreSociedad"] == ""):
+        return jsonify({'msg':'El nombre de la sociedad es requerido'}),400,{'ContentType':"application/json"}
+    if ("fechaCreacion" in data and  data["fechaCreacion"] == ""):
+        return jsonify({'msg':'La fecha de creacion es requerida'}),400,{'ContentType':"application/json"}
+    if ("domicilioLegal" in data and data["domicilioLegal"] == ""):
+        return jsonify({'msg':'El domicilio legal es requerido'}),400,{'ContentType':"application/json"}
+    if ("domicilioReal" in data and data["domicilioReal"] == ""):
+        return jsonify({'msg':'El domicilio real es requerido'}),400,{'ContentType':"application/json"}
+    # Check if email is valid with regex
+    if ("email" in data and data["email"] == "" and  not re.match(r"[^@]+@[^@]+\.[^@]+", data["email"])):
+        return jsonify({'msg':'El email es requerido'}),400,{'ContentType':"application/json"}
+    if ("socios" in data and json.loads(data["socios"]).values().__len__()==0):
         return jsonify({'msg':'No se puede guardar una sociedad sin socios'}),400,{'ContentType':"application/json"}
     if (sociedad.estado==1):
         sociedad.nombre =data["nombreSociedad"]
@@ -108,18 +117,16 @@ def guardarEdicion(hash):
     
     if (sociedad.estado==3):
         if file:
-            print("cambio de archivo")
-            #borrar file vieja
+            #print("cambio de archivo")
+            
             file = request.files['estatuto']
             if file:
-                filename = "estatuto_"+str(sociedad.id)+".pdf"# +"."+ file.filename.split(".")[-1]
+                filename = "estatuto_"+str(sociedad.id)+".pdf"
                 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
                 
                 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp','estatutos')
                 file.save(os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
                 GD.subir_archivo("app/static/temp/estatutos/estatuto_"+str(sociedad.id)+".pdf",GD.folder_estatuto)
-                # UPLOAD_FOLDER = url_for("static",filename= "")
-                # file.save((UPLOAD_FOLDER+filename))
         else:
             return jsonify({'msg':'El estatuto es requerido'}),400,{'ContentType':"application/json"}  
 
@@ -134,13 +141,18 @@ def guardarEdicion(hash):
     sociedad.estado = sociedad.estado - 1
     sociedad.save()
     return Response(status=200)
+
+
 def nuevaPag():
+    if (not "email_user" in session):
+        return redirect(url_for("login"))
     paises= getPaises()["data"]
-    #paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
     
     return render_template("form_sociedad_anonima.html",paises=paises)
 
 def nueva():
+    if (not "email_user" in session):
+        return redirect(url_for("login"))
     data= request.form.to_dict()
 
     
@@ -199,101 +211,6 @@ def nueva():
     
     return Response(status=200)
 
-def estampillar(): #soc_id
-    token = heroku_log()
-    token= json.loads(token.content.decode())["token"]
-    
-    #buscar socciedad
-    soc_id= request.args.get("id_soc")
-    soc= Sociedad.buscarSociedadPorId(soc_id)
-    
-    # buscar expendiente
-    filename = "estatuto_"+str(soc_id)+".pdf"# +"."+ file.filename.split(".")[-1]
-    APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-    UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp', 'estatutos')
-    path= (os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
-    path2 = Path(path)
-    if not path2.exists():
-        GD.bajar_acrchivo_por_nombre("estatuto_"+id+'.pdf',"app/static/temp/estatutos/")
-        if not path2.exists():
-            print("no existe ni en drive")
-            return jsonify({'msg':'Estatuto not found'}),404,{'ContentType':"application/json"}
-    
-    with open(path, "rb") as pdf_file:
-        encoded_string = base64.b64encode(pdf_file.read())
-        
-    #print(encoded_string)
-    # cargar datos de sociedad y expediente
-    datos= {
-        "numeroExpediente": str(soc.id),
-        "file": encoded_string,
-    }
-    res =requests.post("https://dssd-estatuto.herokuapp.com/api/upload/file", data=datos, headers={"Authorization": "Bearer "+token})
-    hash = res.json()["hash"]
-
-
-    soc.hash = hash
-    soc.save()
-    
-    return str(hash) #Response(status=200)
-    
-
-    
-    
-
-def heroku_log():
-    datos={"email":"nahuel_bigu@gmail.com","password":"asd123"}
-    token=requests.post("https://dssd-estatuto.herokuapp.com/api/users/signin",data= datos)
-    return token
-    
-def guardarEnBonita(id,emailApoderado):
-    
-    bonita.autenticion('solicitante.general','solicitante')
-    idProc= bonita.getProcessId("DSSD - Proceso de Registro de SA")
-    caseId= bonita.initiateProcess(idProc)
-   
-    bonita.setVariable(caseId,"emailApoderado",emailApoderado,"java.lang.String")
-    bonita.setVariable(caseId,"idSolicitud",id,"java.lang.String")
-
-    
-    return caseId
-    #activityId= bonita.searchActivityByCase(caseId)
-    
-    #bonita.assignTask(activityId,"4")
-    #bonita.completeActivity(activityId)
-    #return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
-
-def login_general_page():
-    if ("email_user" in session):
-        return redirect(url_for("nueva_sa"))
-    return render_template("login_apoderado.html")
-
-def login_general():
-    data = request.form
-    if Usuario.autenticar(data["email"],data["pass"]):
-        session["email_user"]=data["email"]
-        if "edit" in session:
-            dir = session["edit"]
-            return redirect("/editar/"+dir)
-        return redirect(url_for("menu_apoderado"))
-    else:
-        flash("Usuario o contraseña incorrectos.",category="error")
-        return redirect(url_for("login_apoderado"))
-
-
-def register_general_page():
-    if ("email_user" in session):
-        return redirect(url_for("nueva_sa"))
-    return render_template("register_apoderado.html")
-
-def register_general():
-    data = request.form
-    if Usuario.crearNuevo(data["email"],data["pass"], data["nombre"], data["apellido"], data["dni"]) is not None:
-        session["email_user"]=data["email"]
-        return redirect(url_for("nueva_sa"))
-    else:
-        flash("Datos incorrectos.",category="error")
-        return redirect(url_for("register_apoderado"))
 
 hashnum= 968532556
 def hashear(num): 
@@ -301,79 +218,6 @@ def hashear(num):
 def deshashear(num):
     return num
     
-def loginPage():
-    if ("tipo_user" in session):
-        if session["tipo_user"]==1:
-            return redirect(url_for("menu_mesa_de_entrada"))
-        elif session["tipo_user"]==2:
-            return redirect(url_for("menu_area_de_legales"))
-        else:
-            logout()
-    return render_template("login.html")
-
-
-def logout_general():
-    if session.get("email_user"):
-        del session["email_user"]
-    return redirect(url_for("login_apoderado"))
-
-def logout():
-    if session.get("id_usuario"):
-        del session["tipo_user"]
-        del session["id_usuario"]
-    return redirect(url_for("login_page"))
-
-def login():
-    data = request.form
-    if bonita.autenticion(data["username"],data["password"]):
-        try:
-            r= requests.get("http://localhost:8080/bonita/API/identity/role?f=name=MesaDeEntrada",headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
-            idMesa=r.json()[0]["id"]
-        except:
-            print("no pude levantar el id de mesa de entrada")
-
-        try:
-            r= requests.get("http://localhost:8080/bonita/API/identity/role?f=name=AreaDeLegales",headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
-            idLegales=r.json()[0]["id"]
-        except:
-            print("no pude levantar el id de area legales")
-        
-        try:
-            r= requests.get("http://localhost:8080/bonita/API/identity/role?f=name=gerencia",headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
-            idGerencia=r.json()[0]["id"]
-        except:
-            print("no pude levantar el id de gerencia")    
-
-        r = requests.get("http://localhost:8080/bonita/API/identity/user?f=userName=" + data["username"],headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
-        idUser= r.json()[0]["id"]
-        session["id_usuario"]=idUser
-        r2 = requests.get("http://localhost:8080/bonita/API/identity/membership?f=user_id=" + idUser, headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
-  
-        mesaEntrada=False
-        areaLegales=False
-        gerencia=False
-        for each in r2.json():
-            if not mesaEntrada and each["role_id"]==idMesa:                
-                mesaEntrada=True
-            if not areaLegales and each["role_id"]==idLegales:
-                areaLegales=True
-            if not gerencia and each["role_id"]==idGerencia:
-                gerencia=True
-       
-        if (mesaEntrada):
-            session["tipo_user"]=1
-            return redirect(url_for("menu_mesa_de_entrada"))
-        elif areaLegales:
-            session["tipo_user"]=2
-            return redirect(url_for("menu_area_de_legales"))
-        elif gerencia:
-            session["tipo_user"]=3
-            return redirect(url_for("menu_gerencia"))
-        else:
-            return redirect(url_for("login_page"))
-    else:
-        flash("Usuario desactivado.",category="error")
-        return redirect(url_for("login_page"))
 
 def menu_apoderado():
     if (not "email_user" in session):
@@ -492,40 +336,26 @@ def aceptar_estatuto():
     bonita.completeActivity(activityId)
     return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
 
-# Authenticate to Bonita
-# To log in, use the following request:
-# Request URL
-# http://host:port/bonita/loginservice
-# Request Method
-# POST
-# Content-Type
-# application/x-www-form-urlencoded
-# Form Data
-# username: a username
-# password: a password
-# redirect: true or false. false is the default value if the redirect parameter is not specified. It indicates that the service should not redirect to Bonita Applications (after a successful login) or to the login page (after a login failure).
-# redirectUrl: the URL of the page to be displayed after a succesful login. If it is specified, then the a redirection after the login will be performed even if the "redirect" parameter is not present in the request.
-# tenant: the tenant to log in to (optional for Enterprise and Performance editions, not supported for Community, Teamwork and Efficiency editions)
+
 def vista_sociedad():
-    # get hash from query param "hash"
-    #print(request.full_path)
     # parse request.full_path to get hash
     hash = request.full_path.split("hash=")[-1]
     
-    ## BUSCAR POR SOCIEDAD TODO
     soc= Sociedad.buscarSociedadPorHash(hash)
     if soc is None:
         flash("Sociedad no encontrada",category="error")
         return redirect(url_for("home"))
 
     return render_template("sociedad_vista.html",sociedad=soc)
+
+
 def obtener_estatuo(id):
     soc= Sociedad.buscarSociedadPorId(id)
     if soc is None:
         flash("Sociedad no encontrada",category="error")
         return redirect(url_for("home"))
 
-    filename = "estatuto_"+str(soc.id)+".pdf"# +"."+ file.filename.split(".")[-1]
+    filename = "estatuto_"+str(soc.id)+".pdf"
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
     UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp', 'estatutos')
     path= os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename)
@@ -545,7 +375,7 @@ def obtener_pdf_sociedad(id):
         flash("Sociedad no encontrada",category="error")
         return redirect(url_for("home"))
 
-    filename = "sociedad_"+str(soc.id)+".pdf"# +"."+ file.filename.split(".")[-1]
+    filename = "sociedad_"+str(soc.id)+".pdf"
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
     UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp', 'sociedades')
     path= os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename)
@@ -565,20 +395,8 @@ def generar_carpeta_virtual(id):
         flash("Sociedad no encontrada",category="error")
         return redirect(url_for("home"))
     
-    # Si necesitas el estatuto usa el metodo obtener_estatuto, que te devuelve el file .
-    # Aunque el estatuto es un pdf para mi tenes como que poner un link que te deje obtener el estatuto. Con la ruta 
-
-    # Si necesitas el qr usa el metodo obtener_qr, que te devuelve el file de la imagen.
-    
-    
-    # obtener_qr(soc.id)   HAY QUE VER QUE TE DEVUELVE Y SI TE SIRVE
    
-    # Generar PDF con el estatuo y guardarlo esn static/temp/sociedades/sociedad_{hash}.pdf
-    from io import BytesIO, StringIO
-    from xhtml2pdf import pisa
-    
-    
-    # Generate PDF from render template hola.html
+    # Generar PDF con el estatuo y guardarlo esn static/temp/sociedades/sociedad_{id}.pdf
      
     html = render_template('sociedad.html',sociedad=soc)
     
@@ -591,14 +409,7 @@ def generar_carpeta_virtual(id):
     result.close()
     soc.estado= 5
     soc.save()
-    # Generar carpeta virtual (Subir a drive)
-
-# COMENTARIO TEMPORAL==============================
-#    GD.subir_archivo("app/static/temp/sociedades/sociedad_"+str(soc.id)+".pdf",GD.folder_sociedades)
-    # Version 2
-    #pdf= None
-    #GD.subir_archivo2("sociedad_"+soc.hash+".pdf",pdf,GD.folder_sociedades)
-    # El pdf de la sociedad ya esta arriba en la nube 
+    
     return jsonify({'msg':'Carpeta virtual creada'}),200,{'ContentType':"application/json"}
 
 def generar_carpetas_fisicas():

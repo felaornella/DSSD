@@ -12,14 +12,11 @@ def generar_qr(id):
     # Get qr from the api 
     url = "localhost:5000/sociedad?hash="+str(soc.hash)  # Url de la sociedad que se va a mostrar
     # Find if the qr exists in app/static/qr/ 
-    qr_path = Path("app/static/temp/qr/qr_"+str(soc.id)+'.png')
-    if not qr_path.exists():
-        print("no existe se crea y se guarda en drive")
-        img = qrcode.make(url)
-        img.save('app/static/temp/qr/qr_'+str(soc.id)+'.png')
-        GD.subir_archivo("app/static/temp/qr/qr_"+str(soc.id)+".png",GD.folder_qr)
-    else:
-        print("existe") 
+    print("no existe se crea y se guarda en drive")
+    img = qrcode.make(url)
+    img.save('app/static/temp/qr/qr_'+str(soc.id)+'.png')
+    GD.subir_archivo("app/static/temp/qr/qr_"+str(soc.id)+".png",GD.folder_qr)
+    
         
     # Return 200 OK
     return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}

@@ -36,7 +36,10 @@ def initiateProcess(idProc):
 def searchActivityByCase(caseId):
     res= requests.get("http://localhost:8080/bonita/API/bpm/task", params={"f":"caseId="+str(caseId)} ,headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
     # check if json array is empty
-    if res.json()==[]:
+    print(res.status_code )
+    print(res)
+    #check if is posible to get the json
+    if res.status_code!=200 or res.json()==[]:
         return None
     return res.json()[0]["id"]
 

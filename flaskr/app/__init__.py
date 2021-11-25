@@ -9,7 +9,7 @@ from app.db_sqlalchemy import db_sqlalchemy
 from flask_bootstrap import Bootstrap
 from flask_cors import CORS
 
-from app.resources import sociedad,estadisticas,qr
+from app.resources import sociedad,estadisticas,qr,estampillado,logins_users
 
 
 #va development
@@ -53,25 +53,30 @@ def create_app(environment="development"):
     UPLOAD_FOLDER = 'static/uploads'
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     
-    app.add_url_rule("/solicitud_estampillado", "estampillar", sociedad.estampillar,methods=["GET"])
+    
 
     app.add_url_rule("/", "home", sociedad.home,methods=["GET"])
-    app.add_url_rule("/login", "login_apoderado", sociedad.login_general_page,methods=["GET"])
-    app.add_url_rule("/login", "login_apoderado_post", sociedad.login_general,methods=["POST"])
-    app.add_url_rule("/register", "register_apoderado", sociedad.register_general_page,methods=["GET"])
-    app.add_url_rule("/register", "register_apoderado_post", sociedad.register_general,methods=["POST"])
-    app.add_url_rule("/logout", "logout_apoderado", sociedad.logout_general,methods=["GET"])
-    app.add_url_rule("/gestion/login", "login_page", sociedad.loginPage,methods=["GET"])
-    app.add_url_rule("/gestion/logout", "logout", sociedad.logout,methods=["GET"])
-    app.add_url_rule("/gestion/login", "login", sociedad.login,methods=["POST"])
-    app.add_url_rule("/nueva", "nueva_sa", sociedad.nuevaPag,methods=["GET"])
-    app.add_url_rule("/nueva", "nueva_sa_agregar", sociedad.nueva,methods=["POST"])
-    app.add_url_rule("/editar/<hash>", "edicion_sa", sociedad.editarPag ,methods=["GET"])
-    app.add_url_rule("/editar/<hash>", "editar_sa", sociedad.guardarEdicion,methods=["POST"])
+
+
+    app.add_url_rule("/login", "login_apoderado", logins_users.login_general_page,methods=["GET"])
+    app.add_url_rule("/login", "login_apoderado_post", logins_users.login_general,methods=["POST"])
+    app.add_url_rule("/register", "register_apoderado", logins_users.register_general_page,methods=["GET"])
+    app.add_url_rule("/register", "register_apoderado_post", logins_users.register_general,methods=["POST"])
+    app.add_url_rule("/logout", "logout_apoderado", logins_users.logout_general,methods=["GET"])
+
+    app.add_url_rule("/gestion/login", "login_page", logins_users.loginPage,methods=["GET"])
+    app.add_url_rule("/gestion/login", "login", logins_users.login,methods=["POST"])
+    app.add_url_rule("/gestion/logout", "logout", logins_users.logout,methods=["GET"])
+
     app.add_url_rule("/menu_apoderado", "menu_apoderado", sociedad.menu_apoderado,methods=["GET"])
     app.add_url_rule("/menu_mesa_de_entrada", "menu_mesa_de_entrada", sociedad.menu_mesaEntrada,methods=["GET"])
     app.add_url_rule("/menu_area_de_legales", "menu_area_de_legales", sociedad.menu_legales,methods=["GET"])
     app.add_url_rule("/menu_gerencia", "menu_gerencia", sociedad.menu_gerencia,methods=["GET"])
+
+    app.add_url_rule("/nueva", "nueva_sa", sociedad.nuevaPag,methods=["GET"])
+    app.add_url_rule("/nueva", "nueva_sa_agregar", sociedad.nueva,methods=["POST"])
+    app.add_url_rule("/editar/<hash>", "edicion_sa", sociedad.editarPag ,methods=["GET"])
+    app.add_url_rule("/editar/<hash>", "editar_sa", sociedad.guardarEdicion,methods=["POST"])
     app.add_url_rule("/evaluar_solicitudes", "evaluar_solicitudes", sociedad.evaluar_solicitudes,methods=["GET"])
     app.add_url_rule("/evaluar_estatutos", "evaluar_estatutos", sociedad.evaluar_estatutos,methods=["GET"])
     app.add_url_rule("/rechazar_solicitud", "rechazar_solicitud", sociedad.rechazar_solicitud,methods=["POST"])
@@ -79,37 +84,23 @@ def create_app(environment="development"):
     app.add_url_rule("/rechazar_solicitud_estatuto", "rechazar_solicitud_estatuto", sociedad.rechazar_estatuto,methods=["POST"])
     app.add_url_rule("/aceptar_solicitud_estatuto", "aceptar_solicitud_estatuto", sociedad.aceptar_estatuto,methods=["POST"])
     app.add_url_rule("/sociedad", "vista_sociedad", sociedad.vista_sociedad,methods=["GET"])
-    
 
-    app.add_url_rule("/generar_qr/<id>", "generar_qr", qr.generar_qr,methods=["GET"])
-    app.add_url_rule("/qr/<id>", "obtener_qr", qr.obtener_qr,methods=["GET"])
     app.add_url_rule("/estatutos/<id>", "obtener_estatuto", sociedad.obtener_estatuo,methods=["GET"])
     app.add_url_rule("/generar-carpeta-virtual/<id>", "generar_carpeta_virtual", sociedad.generar_carpeta_virtual,methods=["GET"])
     app.add_url_rule("/sociedad/pdf/<id>", "obtener_pdf_sociedad", sociedad.obtener_pdf_sociedad,methods=["GET"])
-    app.add_url_rule("/gerencia/estadisticas", "estadisticas", estadisticas.get_estadisticas_paises,methods=["GET"])
-    app.add_url_rule("/gerencia/metricas", "metricas", estadisticas.get_metricas,methods=["GET"])
+
+    app.add_url_rule("/solicitud_estampillado", "estampillar", estampillado.estampillar,methods=["GET"])
+
+    app.add_url_rule("/generar_qr/<id>", "generar_qr", qr.generar_qr,methods=["GET"])
+    app.add_url_rule("/qr/<id>", "obtener_qr", qr.obtener_qr,methods=["GET"])
 
     app.add_url_rule("/generar_carpetas_fisicas", "generar_carpetas_fisicas", sociedad.generar_carpetas_fisicas,methods=["GET"])
     app.add_url_rule("/generar_carpeta_fisica", "generar_carpeta_fisica", sociedad.generar_carpeta_fisica,methods=["POST"])
+    
+
+    app.add_url_rule("/gerencia/estadisticas", "estadisticas", estadisticas.get_estadisticas_paises,methods=["GET"])
+    app.add_url_rule("/gerencia/metricas", "metricas", estadisticas.get_metricas,methods=["GET"])
+
     return app
 
-'''
-    # Funciones que se exportan al contexto de Jinja2
-    app.jinja_env.globals.update(is_authenticated=helper_auth.authenticated)
-    
-    @app.errorhandler(InternalServer)
-    def handle_object_not_found_error(e):
-        return jsonify({'message': str(e)}), 500
-
-    @app.errorhandler(BadRequest)
-    def handle_object_not_found_error(e):
-        return jsonify({'message': str(e)}), 400
-
-    # Handlers
-    app.register_error_handler(404, handler.not_found_error)
-    app.register_error_handler(401, handler.unauthorized_error)
-    # Implementar lo mismo para el error 500 y 401
-   
-
-'''
     

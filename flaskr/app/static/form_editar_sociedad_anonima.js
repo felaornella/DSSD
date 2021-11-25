@@ -84,7 +84,7 @@ function agregarSocio() {
 
     listadoSocios.prepend(socioEntero)
     
-    agregarASelect(nombre, porcentaje,socioEntero.getAttribute("id"))
+    agregarASelect(nombre, porcentaje,socioEntero.getAttribute("id"),null)
 
     $("#buttonSocio"+sociosCount).on("click",()=>{quitar(socioEntero.getAttribute("id"))})
 
@@ -133,7 +133,7 @@ function agregarSocioParams(porcentaje, apellidoSocioNuevo,nombreSocioNuevo) {
 
     listadoSocios.prepend(socioEntero)
     
-    agregarASelect(nombre, porciento,socioEntero.getAttribute("id"))
+    agregarASelect(nombre, porciento,socioEntero.getAttribute("id"),null)
 
     $("#buttonSocio"+sociosCount).on("click",()=>{quitar(socioEntero.getAttribute("id"))})
 
@@ -156,8 +156,8 @@ function agregarASelect(name, perc, id, apoderado=false){
     op.innerText= name + " - " + perc
     op.setAttribute("id", "select"+id)
     op.setAttribute("perc",perc)
-
-    if (apoderado){
+    
+    if (apoderado == true || (apoderado == null && sociosEnSelect == 1 || parseInt(perc) > maxPerc) ){
         op.setAttribute("selected",true)
         maxPerc= parseInt(perc)
     }
@@ -256,15 +256,7 @@ function quitarDeSelect(id){
 
 function enviar(){
     var data2={}
-    // data2['nombreSociedad']=$("#nombreSociedad").val().trim()
-    // data2['fechaCreacion']=$("#fechaCreacion").val()
-    // data2['domicilioLegal']=$("#domicilioLegal").val()
-    // data2['domicilioReal']=$("#domicilioReal").val()
-    // data2['emailApoderado']=$("#email").val()
-    // data2['estatuto']=$("#estatuto").val()
-    // print(data2['estatuto'])
-	
-	
+  	
 
 	
     paisesStr=""
@@ -291,11 +283,7 @@ function enviar(){
 
 
 	datos= new FormData(document.getElementById("formulario"))
-	// datos.append('nombreSociedad',$("#nombreSociedad").val().trim())
-	// datos.append('fechaCreacion',$("#fechaCreacion").val())
-	// datos.append('domicilioLegal',$("#domicilioLegal").val())
-	// datos.append('domicilioReal',$("#domicilioReal").val())
-	// datos.append('emailApoderado',$("#email").val())
+
 	var myFile = $('#estatuto').prop('files')
 	datos.append('estatuto',myFile)
 	console.log(myFile)
