@@ -59,13 +59,16 @@
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="paisesExportacion">Países y estados a los que exporta </label>
             <div class="col-sm-10">
-                <select multiple  class="selectpicker col-10" id="paisesExportacion" name="paisesExportacion">
+                <select multiple  class="selectpicker col-10" id="paisesExportacion" name="paisesExportacion" data-live-search="true">
                   {% for continente in paises.continents %}
-                    
+      
+                  <optgroup label="{{continente.name}}">
                     {% for pais in continente.countries %}
                       <option value="{{pais.name}}({{continente.code}})"> {{pais.name}} </option>
                     {% endfor %}
+                  </optgroup>
                   {% endfor %}
+
                 </select>
             </div>
         </div>
