@@ -301,7 +301,7 @@ function enviar(){
 	console.log(myFile)
 	datos.append("paisesExpo",paisesStr)
 	datos.append("socios",JSON.stringify(sociosDic))
-	
+	showLoadingSing()
     $.post({
         url: "/editar/"+String(sociedad_id),
         processData: false,
@@ -309,21 +309,24 @@ function enviar(){
 		processData: false,
         data: datos,
         success: function(response){
+            Swal.close()
             Swal.fire({
               icon: 'success',
               title:'Sociedad editada con exito',
               timer: 2000,
+              willClose: ()=>{window.location.assign("/menu_apoderado")}
             })
             
         },
         error: function(response) {
-          Swal.fire({
-            icon: 'error',
-            title: response.responseJSON["msg"],
-            showConfirmButton: true,
-            timerProgressBar: true,
-            timer: 2500
-          })
+            Swal.close()
+            Swal.fire({
+                icon: 'error',
+                title: response.responseJSON["msg"],
+                showConfirmButton: true,
+                timerProgressBar: true,
+                timer: 2500
+            })
         }
     })
 }
@@ -345,4 +348,16 @@ function limpiarForm(){
 
 function bloqueoCampos(){
     document.getElementById("apoderado").disabled=true
+}
+
+function showLoadingSing(){
+    Swal.fire({
+        title: 'Procesando...',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        html: 'Estamos procesando su pedido, por favor aguarde',
+        didOpen: () => {
+          Swal.showLoading()
+        }
+      })
 }

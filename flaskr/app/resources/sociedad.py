@@ -275,7 +275,7 @@ def login_general():
         if "edit" in session:
             dir = session["edit"]
             return redirect("/editar/"+dir)
-        return redirect(url_for("nueva_sa"))
+        return redirect(url_for("menu_apoderado"))
     else:
         flash("Usuario o contraseña incorrectos.",category="error")
         return redirect(url_for("login_apoderado"))
@@ -374,6 +374,11 @@ def login():
     else:
         flash("Usuario desactivado.",category="error")
         return redirect(url_for("login_page"))
+
+def menu_apoderado():
+    if (not "email_user" in session):
+        return redirect(url_for("login_apoderado"))
+    return render_template("menu_apoderado.html")
 
 def menu_mesaEntrada():
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):

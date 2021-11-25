@@ -4,6 +4,11 @@
   {{ super() }}
 {% endblock %}
 {% block content %}
+<style>
+  .boton_volver-primary{border-color: #f0ad4e; background-color:#f0ad4e; color: white}
+  .boton_volver:hover{border-color: #f0ad4e;background-color:#f0ad4e; color: white ;}
+</style>
+<a  href="/menu_apoderado" style="position: absolute;margin-top: 1rem; margin-left: 2rem;"><button class="btn btn-primary boton_volver-primary boton_volver" style="width: 7rem; height: 3rem; font-size: large;">Volver</button></a>
 <div class="card container" style="background-color: rgba(255,255,255,.5);">
     <div class="card-header">
       <h1>Registre una S.A.</h1>
