@@ -10,7 +10,7 @@ def generar_qr(id):
         return jsonify({'msg':'Sociedad no encontrada'}),404,{'ContentType':"application/json"}
     
     # Get qr from the api 
-    url = "localhost:5000/sociedad/"+str(soc.id)  # Url de la sociedad que se va a mostrar
+    url = "localhost:5000/sociedad?hash="+str(soc.hash)  # Url de la sociedad que se va a mostrar
     # Find if the qr exists in app/static/qr/ 
     qr_path = Path("app/static/temp/qr/qr_"+str(soc.id)+'.png')
     if not qr_path.exists():

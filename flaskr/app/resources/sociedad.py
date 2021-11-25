@@ -31,12 +31,16 @@ def getPaises():
     
     return response
 def editarPag(hash):
-    
+    # check session["email_user"] exist
+    if (not "email_user" in session):
+        return redirect(url_for("login"))
     id= deshashear(int(hash))
     print(id)
     paises= getPaises()["data"]
     soc= Sociedad.buscarSociedadPorId(id)
-    
+    if (session["email_user"] != soc.correoApoderado):
+        flash("No tiene acceso para editar esto.",category="error")
+        return redirect(url_for("home"))
     if not soc:
         return redirect(url_for("home"))
     socios= soc.socios
@@ -48,11 +52,17 @@ def editarPag(hash):
     #paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
     
     return render_template("form_edit_sociedad_anonima.html",soc_id=hash,socios=aux,paises=paises,nombre=soc.nombre, fecha= soc.fechaCreacion,seleccionados=soc.paises.split(","),email= soc.correoApoderado, real=soc.domicilioReal, legal=soc.domicilioLegal)
+
 def guardarEdicion(hash):
+    if (not "email_user" in session):
+        return redirect(url_for("login"))
     id= deshashear(int(hash))
     data= request.form.to_dict()
     file= request.files['estatuto']
     sociedad= Sociedad.buscarSociedadPorId(id)
+    if (session["email_user"] != sociedad.correoApoderado):
+        flash("No tiene acceso para editar esto.",category="error")
+        return redirect(url_for("home"))
     #Buscar sociedad vieja y editarla
 
     sociedad.nombre =data["nombreSociedad"]
@@ -228,7 +238,7 @@ def register_general():
         return redirect(url_for("register_apoderado"))
 
 hashnum= 968532556
-def hashear(num):
+def hashear(num): 
     return int(num)+hashnum
 def deshashear(num):
     return int(num)-hashnum
