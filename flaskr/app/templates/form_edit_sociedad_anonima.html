@@ -121,13 +121,21 @@
 {% endblock %}
 {% block scripts %}
   <script src="{{url_for('static',filename='form_editar_sociedad_anonima.js')}}"></script>
-  
   <script>
 	var sociedad_id= {{soc_id}}
-	
+	{%if socios%}
+	var sociosCount=0
+	var porcentajeTot=0
+
+	var sociosEnSelect=0
+
+	var maxPerc = 0
+	var listadoSocios = $("#bloqueListado")
+	var selectSocios = document.getElementById("apoderado")
+	{%endif%}
 	{% for soc in socios %}
 	
-	  porcentajeTot = porcentajeTot + {{soc.porcentaje}}
+	porcentajeTot = porcentajeTot + {{soc.porcentaje}}
     sociosCount=sociosCount+1
 
     var nombre = "{{soc.apellidoSocioNuevo}}" + ", " + "{{soc.nombreSocioNuevo}}"
