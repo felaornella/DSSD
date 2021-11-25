@@ -12,6 +12,7 @@ import base64
 from pathlib import Path
 import datetime
 from cryptography.fernet import Fernet
+import re
 
 def home():
     return render_template("home.html")
@@ -141,7 +142,27 @@ def nuevaPag():
 
 def nueva():
     data= request.form.to_dict()
-    file= request.files['estatuto']
+
+    
+    if ("estatuto" in request.files and request.files['estatuto']):
+        file= request.files['estatuto']
+    else :
+        return jsonify({'msg':'El estatuto es requerido'}),400,{'ContentType':"application/json"}
+    # Check all fields are filled in data and return especific error if not
+    if (data["nombreSociedad"] == ""):
+        return jsonify({'msg':'El nombre de la sociedad es requerido'}),400,{'ContentType':"application/json"}
+    if (data["fechaCreacion"] == ""):
+        return jsonify({'msg':'La fecha de creacion es requerida'}),400,{'ContentType':"application/json"}
+    if (data["domicilioLegal"] == ""):
+        return jsonify({'msg':'El domicilio legal es requerido'}),400,{'ContentType':"application/json"}
+    if (data["domicilioReal"] == ""):
+        return jsonify({'msg':'El domicilio real es requerido'}),400,{'ContentType':"application/json"}
+    # Check if email is valid with regex
+    if (data["email"] == "" and  not re.match(r"[^@]+@[^@]+\.[^@]+", data["email"])):
+        return jsonify({'msg':'El email es requerido'}),400,{'ContentType':"application/json"}
+    if (json.loads(data["socios"]).values().__len__()==0):
+        return jsonify({'msg':'No se puede guardar una sociedad sin socios'}),400,{'ContentType':"application/json"}
+
 
     
     sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["email"],data["paisesExpo"],0)
@@ -163,7 +184,7 @@ def nueva():
     
     sociedad.save()
     #print(sociedad.id)
-    file = request.files['estatuto']
+    
     if file:
         filename = "estatuto_"+str(sociedad.id)+".pdf"# +"."+ file.filename.split(".")[-1]
         APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -214,7 +235,7 @@ def estampillar(): #soc_id
     soc.hash = hash
     soc.save()
     
-    return jsonify({'hash':hash}),200,{'ContentType':"application/json"} #Response(status=200)
+    return str(hash) #Response(status=200)
     
 
     
