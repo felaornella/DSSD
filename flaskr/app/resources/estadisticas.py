@@ -21,6 +21,8 @@ def getContinentes():
     return response
 
 def get_estadisticas_paises():
+    if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=3):
+        return redirect(url_for("login_page"))
     # Get estadisticas de paises de la sociedades
     sociedades = Sociedad.all()
     paises_estadisticas = {}
@@ -65,6 +67,8 @@ def get_estadisticas_paises():
     # Get estadisticas de paises de la sociedades
 
 def get_metricas():
+    if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=3):
+        return redirect(url_for("login_page"))
     cant_fallidos=0
     cant_activos=0
     activitys= bonita.getAllActivity()
