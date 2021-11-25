@@ -41,14 +41,18 @@ def editarPag(hash):
     print(id)
     paises= getPaises()["data"]
     soc= Sociedad.buscarSociedadPorId(id)
-    if (soc.estado!=1 and soc.estado!=3):
-        flash("La sociedad esta en estado de evaluacion.",category="error")
+    if not soc:
         return redirect(url_for("home"))
     if (session["email_user"] != soc.correoApoderado):
         flash("No tiene acceso para editar esto.",category="error")
         return redirect(url_for("home"))
-    if not soc:
+    if (soc.estado!=1 and soc.estado!=3):
+        flash("La sociedad esta en estado de evaluacion.",category="error")
         return redirect(url_for("home"))
+    if (bonita.searchActivityByCase(soc.caseId) == None):
+        flash("Paso el limite de tiempo para editar. Debe iniciar el proceo devuelta",category="error")
+        return redirect(url_for("home"))
+    
     socios= soc.socios
     aux=[]
     for soci in socios:
