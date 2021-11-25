@@ -56,7 +56,7 @@ def editarPag(hash):
     socios= soc.socios
     aux=[]
     for soci in socios:
-        aux.append({"porcentaje":soci.porcentaje, "nombreSocioNuevo":soci.nombre,"apellidoSocioNuevo":soci.apellido})
+        aux.append({"porcentaje":soci.porcentaje, "nombreSocioNuevo":soci.nombre,"apellidoSocioNuevo":soci.apellido,'apoderado':soci.apoderado})
     #paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
     print(soc.estado)
     return render_template("form_edit_sociedad_anonima.html",estado=soc.estado,soc_id=hash,socios=aux,paises=paises,nombre=soc.nombre, fecha= soc.fechaCreacion,seleccionados=soc.paises.split(","),email= soc.correoApoderado, real=soc.domicilioReal, legal=soc.domicilioLegal)
@@ -68,7 +68,10 @@ def guardarEdicion(hash):
         return redirect(url_for("login"))
     id= deshashear(int(hash))
     data= request.form.to_dict()
-    file= request.files['estatuto']
+    if ("estatuto" in request.files):
+        file= request.files['estatuto']
+    else :
+        file= None
     sociedad= Sociedad.buscarSociedadPorId(id)
     print(sociedad.estado)
     print(sociedad.estado!=1)
@@ -78,15 +81,45 @@ def guardarEdicion(hash):
     if (session["email_user"] != sociedad.correoApoderado):
         return jsonify({'msg':'No tenes acceso para editar esto'}),400,{'ContentType':"application/json"}
     #Buscar sociedad vieja y editarla
+    if (sociedad.estado==1):
+        sociedad.nombre =data["nombreSociedad"]
+        sociedad.fechaCreacion =data["fechaCreacion"]
+        sociedad.domicilioLegal =data["domicilioLegal"]
+        sociedad.domicilioReal =data["domicilioReal"]
+        sociedad.correoApoderado =data["email"]
+        sociedad.paises =data["paisesExpo"]
+        
 
-    sociedad.nombre =data["nombreSociedad"]
-    sociedad.fechaCreacion =data["fechaCreacion"]
-    sociedad.domicilioLegal =data["domicilioLegal"]
-    sociedad.domicilioReal =data["domicilioReal"]
-    sociedad.correoApoderado =data["email"]
-    sociedad.paises =data["paisesExpo"]
-    sociedad.estado = sociedad.estado - 1
+        #eliminar socios
+        for socio in sociedad.socios:
+            socio.delete()
+        for each in json.loads(data["socios"]).values():
+            soc = Socio(each["nombre"],each["apellido"],each["porcentaje"],each["apoderado"])
+            sociedad.socios.append(soc)
+        
+   
+
+    if "edit" in session:
+        del session["edit"]
     
+    if (sociedad.estado==3):
+        if file:
+            print("cambio de archivo")
+            #borrar file vieja
+            file = request.files['estatuto']
+            if file:
+                filename = "estatuto_"+str(sociedad.id)+".pdf"# +"."+ file.filename.split(".")[-1]
+                APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+                
+                UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp','estatutos')
+                file.save(os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
+                GD.subir_archivo("app/static/temp/estatutos/estatuto_"+str(sociedad.id)+".pdf",GD.folder_estatuto)
+                # UPLOAD_FOLDER = url_for("static",filename= "")
+                # file.save((UPLOAD_FOLDER+filename))
+        else:
+            return jsonify({'msg':'El estatuto es requerido'}),400,{'ContentType':"application/json"}  
+
+      
     bonita.autenticion('solicitante.general','solicitante')
     r= requests.get("http://localhost:8080/bonita/API/identity/role?f=name=Solicitante",headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
     idSolic=r.json()[0]["id"]
@@ -94,36 +127,8 @@ def guardarEdicion(hash):
     activityId= bonita.searchActivityByCase(sociedad.caseId)
     bonita.assignTask(activityId,idSolic)
     bonita.completeActivity(activityId)
-
-    if "edit" in session:
-        del session["edit"]
-    
-
-    #eliminar socios
-    for socio in sociedad.socios:
-        socio.delete()
-    for each in json.loads(data["socios"]).values():
-        soc = Socio(each["nombre"],each["apellido"],each["porcentaje"],each["apoderado"])
-        sociedad.socios.append(soc)
-
-    
-    
+    sociedad.estado = sociedad.estado - 1
     sociedad.save()
-    if file:
-        #borrar file vieja
-        file = request.files['estatuto']
-        if file:
-            filename = "estatuto_"+str(sociedad.id)+".pdf"# +"."+ file.filename.split(".")[-1]
-            APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-            
-            UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static','temp','estatutos')
-            file.save(os.path.join(UPLOAD_FOLDER.replace("\\resources",""), filename))
-            GD.subir_archivo("app/static/temp/estatutos/estatuto_"+str(sociedad.id)+".pdf",GD.folder_estatuto)
-            # UPLOAD_FOLDER = url_for("static",filename= "")
-            # file.save((UPLOAD_FOLDER+filename))
-            
-
-    
     return Response(status=200)
 def nuevaPag():
     paises= getPaises()["data"]

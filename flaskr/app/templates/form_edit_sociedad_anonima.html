@@ -59,7 +59,7 @@
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="paisesExportacion">Países y estados a los que exporta </label>
             <div class="col-sm-10">
-                <select multiple  class="selectpicker col-10" id="paisesExportacion" name="paisesExportacion" {% if estado !=  1%} disabled{%endif%}>
+                <select multiple  class="selectpicker col-10" id="paisesExportacion" name="paisesExportacion" {% if estado != 1 %} disabled{%endif%}>
                   {% for continente in paises.continents %}
                     {% for pais in continente.countries %}
                       {% if pais.name + "(" + continente.code + ")" in seleccionados %}
@@ -87,14 +87,14 @@
 
         <div class="row" style="background-color: rgba(0,0,0,0.15); padding: 1rem; border-radius: .25rem; margin:1px">
           <div class="col-4">
-            <input class="form-control" type="text" placeholder="Nombre Socio" id="nombreSocioNuevo"><br>
-            <input class="form-control" type="text" placeholder="Apellido Socio" id="apellidoSocioNuevo"><br>
-            <input class="form-control" type="number" placeholder="Porcentaje Socio" id="porcentaje"><br>
+            <input class="form-control" type="text" placeholder="Nombre Socio" id="nombreSocioNuevo" {% if estado != 1 %} disabled{%endif%} ><br>
+            <input class="form-control" type="text" placeholder="Apellido Socio" id="apellidoSocioNuevo" {% if estado != 1 %} disabled{%endif%} ><br>
+            <input class="form-control" type="number" placeholder="Porcentaje Socio" id="porcentaje" {% if estado != 1 %} disabled{%endif%} ><br>
             <button type="button" class="btn btn-primary" id="buttonAddSocioNuevo" style="width: 60%; margin-left: 20%; margin-right: 20%;" >Agregar</button>
           </div>
           <div class="col-8" >
             <div id="selectApoderado">
-              <select class="form-control" id="apoderado" disabled>
+              <select class="form-control" id="apoderado" {% if estado != 1 %} disabled{%endif%}>
                 <option value="-1" perc="-1" id="optionNoData">No hay datos para seleccionar</option>
               </select>
             </div>
@@ -122,65 +122,69 @@
 {% block scripts %}
   <script src="{{url_for('static',filename='form_editar_sociedad_anonima.js')}}"></script>
   <script>
+    
 	var sociedad_id= {{soc_id}}
-	{%if socios%}
-	var sociosCount=0
-	var porcentajeTot=0
 
-	var sociosEnSelect=0
-
-	var maxPerc = 0
-	var listadoSocios = $("#bloqueListado")
-	var selectSocios = document.getElementById("apoderado")
-	{%endif%}
 	{% for soc in socios %}
 	
-	porcentajeTot = porcentajeTot + {{soc.porcentaje}}
+	  porcentajeTot = porcentajeTot + {{soc.porcentaje}}
     sociosCount=sociosCount+1
 
-    var nombre = "{{soc.apellidoSocioNuevo}}" + ", " + "{{soc.nombreSocioNuevo}}"
-    var porciento = {{soc.porcentaje}}
+    var nombre{{loop.index}} = "{{soc.apellidoSocioNuevo}}" + ", " + "{{soc.nombreSocioNuevo}}"
+    var porciento{{loop.index}} = {{soc.porcentaje}}
 
-    var socio = document.createElement("p")
-    socio.innerText= nombre + " - " + porciento + "%"
-    socio.setAttribute("style","margin-bottom: 0; font-size:1.25rem")
+    var socio{{loop.index}} = document.createElement("p")
+    socio{{loop.index}}.innerText= nombre{{loop.index}} + " - " + porciento{{loop.index}} + "%"
+    socio{{loop.index}}.setAttribute("style","margin-bottom: 0; font-size:1.25rem")
 
 
-    var colSocio= document.createElement("div")
-    colSocio.setAttribute("class","col-8")
-    colSocio.setAttribute("style","text-align:left")
+    var colSocio{{loop.index}}= document.createElement("div")
+    colSocio{{loop.index}}.setAttribute("class","col-8")
+    colSocio{{loop.index}}.setAttribute("style","text-align:left")
     
-    var colButton= document.createElement("div")
-    colButton.setAttribute("class","col-3")
+    var colButton{{loop.index}}= document.createElement("div")
+    colButton{{loop.index}}.setAttribute("class","col-3")
     
-    var button= document.createElement("button")
-    button.innerText="X"
-    button.setAttribute("class","btn btn-outline-danger")
-    button.setAttribute("id","buttonSocio"+ sociosCount)
+    {% if estado == 1%} 
+      var button{{loop.index}}= document.createElement("button")
+      button{{loop.index}}.innerText="X"
+      button{{loop.index}}.setAttribute("class","btn btn-outline-danger")
+      button{{loop.index}}.setAttribute("id","buttonSocio"+ sociosCount)
+      colButton{{loop.index}}.appendChild(button{{loop.index}})
+    {%endif%}  
+    colSocio{{loop.index}}.appendChild(socio{{loop.index}})
     
-    colButton.appendChild(button)
-    colSocio.appendChild(socio)
-    
-    var socioEntero = document.createElement("div")
-    socioEntero.setAttribute("class","row  align-items-center")
-    socioEntero.setAttribute("style","margin-bottom:1rem; border-bottom: 1.5px solid rgba(0,0,0,0.25); padding-bottom:.5rem")
-    socioEntero.setAttribute("id","socio"+sociosCount)
-    socioEntero.setAttribute("perc",porciento)
-    socioEntero.setAttribute("nombre", "{{soc.nombreSocioNuevo}}")
-    socioEntero.setAttribute("apellido","{{soc.apellidoSocioNuevo}}")
-    socioEntero.appendChild(colSocio)
-    socioEntero.appendChild(colButton)
+    var socioEntero{{loop.index}} = document.createElement("div")
+    socioEntero{{loop.index}}.setAttribute("class","row  align-items-center")
+    socioEntero{{loop.index}}.setAttribute("style","margin-bottom:1rem; border-bottom: 1.5px solid rgba(0,0,0,0.25); padding-bottom:.5rem")
+    socioEntero{{loop.index}}.setAttribute("id","socio"+sociosCount)
+    socioEntero{{loop.index}}.setAttribute("perc",porciento{{loop.index}})
+    socioEntero{{loop.index}}.setAttribute("nombre", "{{soc.nombreSocioNuevo}}")
+    socioEntero{{loop.index}}.setAttribute("apellido","{{soc.apellidoSocioNuevo}}")
+    socioEntero{{loop.index}}.appendChild(colSocio{{loop.index}})
+    socioEntero{{loop.index}}.appendChild(colButton{{loop.index}})
 
-    listadoSocios.prepend(socioEntero)
+    listadoSocios.prepend(socioEntero{{loop.index}})
     
-    agregarASelect(nombre, porciento,socioEntero.getAttribute("id"))
+    agregarASelect(nombre{{loop.index}}, porciento{{loop.index}},socioEntero{{loop.index}}.getAttribute("id"),
+    {%if soc.apoderado %}
+    true
+    {%else%}  
+    false
+    {%endif%}
+    
+    )
 
-    $("#buttonSocio"+sociosCount).on("click",()=>{quitar(socioEntero.getAttribute("id"))})
+    $("#buttonSocio"+sociosCount).on("click",()=>{quitar(socioEntero{{loop.index}}.getAttribute("id"))})
 
     $("#nombreSocioNuevo").val("")
     $("#apellidoSocioNuevo").val("")
     $("#porcentaje").val("")
     bloqueoCampos()
 	{% endfor %}
+
+  {% if estado !=  1%} 
+  bloqueoSelectpicker()
+    {%endif%}
   </script>
 {% endblock %}
