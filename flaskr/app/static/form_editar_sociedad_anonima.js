@@ -314,7 +314,7 @@ function enviar(){
               icon: 'success',
               title:'Sociedad editada con exito',
               timer: 2000,
-              willClose: ()=>{window.location.assign("/")}
+              willClose: ()=>{window.location.assign("/menu_apoderado")}
             })
             
         },

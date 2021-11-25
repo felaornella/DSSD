@@ -68,6 +68,7 @@ def create_app(environment="development"):
     app.add_url_rule("/nueva", "nueva_sa_agregar", sociedad.nueva,methods=["POST"])
     app.add_url_rule("/editar/<hash>", "edicion_sa", sociedad.editarPag ,methods=["GET"])
     app.add_url_rule("/editar/<hash>", "editar_sa", sociedad.guardarEdicion,methods=["POST"])
+    app.add_url_rule("/menu_apoderado", "menu_apoderado", sociedad.menu_apoderado,methods=["GET"])
     app.add_url_rule("/menu_mesa_de_entrada", "menu_mesa_de_entrada", sociedad.menu_mesaEntrada,methods=["GET"])
     app.add_url_rule("/menu_area_de_legales", "menu_area_de_legales", sociedad.menu_legales,methods=["GET"])
     app.add_url_rule("/menu_gerencia", "menu_gerencia", sociedad.menu_gerencia,methods=["GET"])
