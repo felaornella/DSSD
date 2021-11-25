@@ -36,8 +36,14 @@
                         <!-- buttons for login -->
                         <div class="col-md-12">
                             <div class="text-center">
-                                <a href="{{ url_for('login_apoderado') }}" class="btn btn-primary">Login Apoderado</a>
-                                <a href="{{ url_for('login_page') }}" class="btn btn-primary">Login Gestion</a>
+                                {% if "email_user" in session%} 
+                                    <a href="{{ url_for('login_apoderado') }}" class="btn btn-primary">Continuar</a>
+                                {%elif "id_user" in session %}
+                                    <a href="{{ url_for('login') }}" class="btn btn-primary">Continuar</a>
+                                {%else%}
+                                    <a href="{{ url_for('login_apoderado') }}" class="btn btn-primary">Login Apoderado</a>
+                                    <a href="{{ url_for('login_page') }}" class="btn btn-primary">Login Gestion</a>
+                                {%endif%}
                             </div>
                         </div>
                     </div>

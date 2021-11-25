@@ -5,8 +5,8 @@
 {% endblock %}
 {% block content %}
 <div class="card container" style="background-color: rgba(255,255,255,.5);">
-    <div class="card-header">
-      <h1>Registre una S.A.</h1>
+    <div class="card-header" style="text-align: center;">
+      <h1>EDITAR MI S.A.</h1>
     </div>
     <div class="card-body">
       <form id="formulario">
@@ -16,14 +16,14 @@
         <div class="form-group row">
           <label class='col-sm-2 col-form-label' for="nombreSociedad">Nombre de la Sociedad Anonima: </label>
           <div class="col-sm-10">
-              <input class="form-control"  type="text" id="nombreSociedad" name="nombreSociedad" {% if nombre %} value ={{nombre}}{% endif %}>
+              <input class="form-control"  type="text" id="nombreSociedad" name="nombreSociedad" value ="{{nombre}}">
           </div>
         </div>
         
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="fechaCreacion">Fecha de creacion de la Sociedad Anonima: </label>
             <div class="col-sm-10">
-                <input class="form-control" type="date" id="fechaCreacion" name="fechaCreacion" {% if fecha%} value ={{fecha}}{% endif %}>
+              <input class="form-control" type="date" id="fechaCreacion" name="fechaCreacion" value ={{fecha}}>
             </div>
         </div>
 
@@ -37,13 +37,13 @@
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="domicilioLegal">Domicilio Legal: </label>
             <div class="col-sm-10">
-                <input class="form-control" type="text" id="domicilioLegal" name="domicilioLegal" {% if legal%} value ={{legal}}{% endif %}>
+                <input class="form-control" type="text" id="domicilioLegal" name="domicilioLegal" value ="{{legal}}">
             </div>
         </div>
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="domicilioReal">Domicilio Real: </label>
             <div class="col-sm-10">
-                <input class="form-control" type="text" id="domicilioReal" name="domicilioReal" {% if real%} value ={{real}}{% endif %}>
+                <input class="form-control" type="text" id="domicilioReal" name="domicilioReal" value ="{{real}}">
             </div>
         </div>
         
@@ -52,7 +52,7 @@
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="email">Correo Electrónico (del apoderado): </label>
             <div class="col-sm-10">
-                <input class="form-control" type="email" id="email" name="email" {% if email%} value ={{email}}{% endif %}>
+                <input class="form-control" type="email" id="email" name="email" value ="{{email}}">
             </div>
         </div>
 
@@ -61,9 +61,12 @@
             <div class="col-sm-10">
                 <select multiple  class="selectpicker col-10" id="paisesExportacion" name="paisesExportacion">
                   {% for continente in paises.continents %}
-                    
                     {% for pais in continente.countries %}
-                      <option value="{{pais.name}}({{continente.code}})" {% if pais.name in seleccionados %} selected=true {% endif %}> {{pais.name}} </option>
+                      {% if pais.name + "(" + continente.code + ")" in seleccionados %}
+                        <option value="{{pais.name}}({{continente.code}})" selected> {{pais.name}} </option>
+                      {%else%}
+                        <option value="{{pais.name}}({{continente.code}})"> {{pais.name}} </option>
+                      {%endif%}
                     {% endfor %}
                   {% endfor %}
                 </select>

@@ -30,14 +30,20 @@ def getPaises():
     response = requests.request("POST", url, headers=headers, data=payload).json()
     
     return response
+
+
 def editarPag(hash):
     # check session["email_user"] exist
     if (not "email_user" in session):
-        return redirect(url_for("login"))
+        session["edit"]=hash
+        return redirect(url_for("login_apoderado"))
     id= deshashear(int(hash))
     print(id)
     paises= getPaises()["data"]
     soc= Sociedad.buscarSociedadPorId(id)
+    if (soc.estado!=1 and soc.estado!=3):
+        flash("La sociedad esta en estado de evaluacion.",category="error")
+        return redirect(url_for("home"))
     if (session["email_user"] != soc.correoApoderado):
         flash("No tiene acceso para editar esto.",category="error")
         return redirect(url_for("home"))
@@ -47,22 +53,26 @@ def editarPag(hash):
     aux=[]
     for soci in socios:
         aux.append({"porcentaje":soci.porcentaje, "nombreSocioNuevo":soci.nombre,"apellidoSocioNuevo":soci.apellido})
-    print(socios)
-    print(aux)
     #paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
-    
+    print(soc.nombre)
     return render_template("form_edit_sociedad_anonima.html",soc_id=hash,socios=aux,paises=paises,nombre=soc.nombre, fecha= soc.fechaCreacion,seleccionados=soc.paises.split(","),email= soc.correoApoderado, real=soc.domicilioReal, legal=soc.domicilioLegal)
 
+
 def guardarEdicion(hash):
+    
     if (not "email_user" in session):
         return redirect(url_for("login"))
     id= deshashear(int(hash))
     data= request.form.to_dict()
     file= request.files['estatuto']
     sociedad= Sociedad.buscarSociedadPorId(id)
+    print(sociedad.estado)
+    print(sociedad.estado!=1)
+    print(sociedad.estado!=3)
+    if (sociedad.estado!=1 and sociedad.estado!=3):
+        return jsonify({'msg':'La sociedad esta en estado de evaluacion'}),400,{'ContentType':"application/json"}
     if (session["email_user"] != sociedad.correoApoderado):
-        flash("No tiene acceso para editar esto.",category="error")
-        return redirect(url_for("home"))
+        return jsonify({'msg':'No tenes acceso para editar esto'}),400,{'ContentType':"application/json"}
     #Buscar sociedad vieja y editarla
 
     sociedad.nombre =data["nombreSociedad"]
@@ -71,8 +81,20 @@ def guardarEdicion(hash):
     sociedad.domicilioReal =data["domicilioReal"]
     sociedad.correoApoderado =data["email"]
     sociedad.paises =data["paisesExpo"]
-    sociedad.estado =0
+    sociedad.estado = sociedad.estado - 1
     
+    bonita.autenticion('solicitante.general','solicitante')
+    r= requests.get("http://localhost:8080/bonita/API/identity/role?f=name=Solicitante",headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+    idSolic=r.json()[0]["id"]
+
+    activityId= bonita.searchActivityByCase(sociedad.caseId)
+    bonita.assignTask(activityId,idSolic)
+    bonita.completeActivity(activityId)
+
+    if "edit" in session:
+        del session["edit"]
+    
+
     #eliminar socios
     for socio in sociedad.socios:
         socio.delete()
@@ -217,6 +239,9 @@ def login_general():
     data = request.form
     if Usuario.autenticar(data["email"],data["pass"]):
         session["email_user"]=data["email"]
+        if "edit" in session:
+            dir = session["edit"]
+            return redirect("/editar/"+dir)
         return redirect(url_for("nueva_sa"))
     else:
         flash("Usuario o contraseña incorrectos.",category="error")
@@ -257,7 +282,6 @@ def loginPage():
 def logout_general():
     if session.get("email_user"):
         del session["email_user"]
-        del session["tipo_user"]
     return redirect(url_for("login_apoderado"))
 
 def logout():
