@@ -71,7 +71,7 @@ def guardarEdicion(hash):
     sociedad.domicilioReal =data["domicilioReal"]
     sociedad.correoApoderado =data["email"]
     sociedad.paises =data["paisesExpo"]
-    sociedad.estado ="Esperando Confirmacion"
+    sociedad.estado =0
     
     #eliminar socios
     for socio in sociedad.socios:
@@ -110,7 +110,7 @@ def nueva():
     file= request.files['estatuto']
 
     
-    sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["email"],data["paisesExpo"],"Esperando Confirmacion")
+    sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["email"],data["paisesExpo"],0)
     if sociedad.paises == "":
         sociedad.paises = "Argentina(SA)" 
     
@@ -239,9 +239,9 @@ def register_general():
 
 hashnum= 968532556
 def hashear(num): 
-    return int(num)+hashnum
+    return num
 def deshashear(num):
-    return int(num)-hashnum
+    return num
     
 def loginPage():
     if ("tipo_user" in session):
@@ -256,22 +256,14 @@ def loginPage():
 
 def logout_general():
     if session.get("email_user"):
-        temp=[]
-        for each in session:
-            temp.append(each)
-        for each in temp:
-            if each != "_permanent":
-                del session[each]
+        del session["email_user"]
+        del session["tipo_user"]
     return redirect(url_for("login_apoderado"))
 
 def logout():
     if session.get("id_usuario"):
-        temp=[]
-        for each in session:
-            temp.append(each)
-        for each in temp:
-            if each != "_permanent":
-                del session[each]
+        del session["tipo_user"]
+        del session["id_usuario"]
     return redirect(url_for("login_page"))
 
 def login():
@@ -288,9 +280,9 @@ def login():
             idLegales=r.json()[0]["id"]
         except:
             print("no pude levantar el id de area legales")
-
+        
         try:
-            r= requests.get("http://localhost:8080/bonita/API/identity/role?f=name=Gerencia",headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+            r= requests.get("http://localhost:8080/bonita/API/identity/role?f=name=gerencia",headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
             idGerencia=r.json()[0]["id"]
         except:
             print("no pude levantar el id de gerencia")    
