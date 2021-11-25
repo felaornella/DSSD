@@ -432,7 +432,7 @@ def aceptar_estatuto():
 # tenant: the tenant to log in to (optional for Enterprise and Performance editions, not supported for Community, Teamwork and Efficiency editions)
 def vista_sociedad():
     # get hash from query param "hash"
-    print(request.full_path)
+    #print(request.full_path)
     # parse request.full_path to get hash
     hash = request.full_path.split("hash=")[-1]
     
@@ -442,7 +442,7 @@ def vista_sociedad():
         flash("Sociedad no encontrada",category="error")
         return redirect(url_for("home"))
 
-    return render_template("sociedad.html",sociedad=soc)
+    return render_template("sociedad_vista.html",sociedad=soc)
 def obtener_estatuo(id):
     soc= Sociedad.buscarSociedadPorId(id)
     if soc is None:
