@@ -33,7 +33,7 @@ def getPaises():
 
 
 def editarPag(hash):
-    # check session["email_user"] exist
+
     if (not "email_user" in session):
         session["edit"]=hash
         return redirect(url_for("login_apoderado"))
@@ -54,8 +54,8 @@ def editarPag(hash):
     for soci in socios:
         aux.append({"porcentaje":soci.porcentaje, "nombreSocioNuevo":soci.nombre,"apellidoSocioNuevo":soci.apellido})
     #paises = requests.get("https://countriesnow.space/api/v0.1/countries/states").json()["data"]
-    print(soc.nombre)
-    return render_template("form_edit_sociedad_anonima.html",soc_id=hash,socios=aux,paises=paises,nombre=soc.nombre, fecha= soc.fechaCreacion,seleccionados=soc.paises.split(","),email= soc.correoApoderado, real=soc.domicilioReal, legal=soc.domicilioLegal)
+    print(soc.estado)
+    return render_template("form_edit_sociedad_anonima.html",estado=soc.estado,soc_id=hash,socios=aux,paises=paises,nombre=soc.nombre, fecha= soc.fechaCreacion,seleccionados=soc.paises.split(","),email= soc.correoApoderado, real=soc.domicilioReal, legal=soc.domicilioLegal)
 
 
 def guardarEdicion(hash):

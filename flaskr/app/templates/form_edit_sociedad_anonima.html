@@ -16,34 +16,34 @@
         <div class="form-group row">
           <label class='col-sm-2 col-form-label' for="nombreSociedad">Nombre de la Sociedad Anonima: </label>
           <div class="col-sm-10">
-              <input class="form-control"  type="text" id="nombreSociedad" name="nombreSociedad" value ="{{nombre}}">
+              <input class="form-control"  type="text" id="nombreSociedad" name="nombreSociedad" value ="{{nombre}}" {% if estado !=  1%} disabled {%endif%}>
           </div>
         </div>
         
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="fechaCreacion">Fecha de creacion de la Sociedad Anonima: </label>
             <div class="col-sm-10">
-              <input class="form-control" type="date" id="fechaCreacion" name="fechaCreacion" value ={{fecha}}>
+              <input class="form-control" type="date" id="fechaCreacion" name="fechaCreacion" value ={{fecha}} {% if estado !=  1%} disabled{%endif%}>
             </div>
         </div>
 
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="estatuto">Cambiar estatuto de conformación firmado por escribano público: </label>
             <div class="col-sm-10">
-                <input class="form-control" type="file" accept=".docx,.odt,.pdf" id="estatuto" name="estatuto" style="padding-top: .2rem;">
+                <input class="form-control" type="file" accept=".docx,.odt,.pdf" id="estatuto" name="estatuto" style="padding-top: .2rem;" {% if estado !=  3%} disabled{%endif%}>
             </div>
         </div>
 
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="domicilioLegal">Domicilio Legal: </label>
             <div class="col-sm-10">
-                <input class="form-control" type="text" id="domicilioLegal" name="domicilioLegal" value ="{{legal}}">
+                <input class="form-control" type="text" id="domicilioLegal" name="domicilioLegal" value ="{{legal}}" {% if estado !=  1%} disabled{%endif%}>
             </div>
         </div>
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="domicilioReal">Domicilio Real: </label>
             <div class="col-sm-10">
-                <input class="form-control" type="text" id="domicilioReal" name="domicilioReal" value ="{{real}}">
+                <input class="form-control" type="text" id="domicilioReal" name="domicilioReal" value ="{{real}}" {% if estado !=  1%} disabled{%endif%}>
             </div>
         </div>
         
@@ -52,14 +52,14 @@
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="email">Correo Electrónico (del apoderado): </label>
             <div class="col-sm-10">
-                <input class="form-control" type="email" id="email" name="email" value ="{{email}}">
+                <input class="form-control" type="email" id="email" name="email" value ="{{email}}" {% if estado !=  1%} disabled{%endif%}>
             </div>
         </div>
 
         <div class="form-group row">
             <label class='col-sm-2 col-form-label' for="paisesExportacion">Países y estados a los que exporta </label>
             <div class="col-sm-10">
-                <select multiple  class="selectpicker col-10" id="paisesExportacion" name="paisesExportacion">
+                <select multiple  class="selectpicker col-10" id="paisesExportacion" name="paisesExportacion" {% if estado !=  1%} disabled{%endif%}>
                   {% for continente in paises.continents %}
                     {% for pais in continente.countries %}
                       {% if pais.name + "(" + continente.code + ")" in seleccionados %}
@@ -90,7 +90,7 @@
             <input class="form-control" type="text" placeholder="Nombre Socio" id="nombreSocioNuevo"><br>
             <input class="form-control" type="text" placeholder="Apellido Socio" id="apellidoSocioNuevo"><br>
             <input class="form-control" type="number" placeholder="Porcentaje Socio" id="porcentaje"><br>
-            <button type="button" class="btn btn-primary" id="buttonAddSocioNuevo" style="width: 60%; margin-left: 20%; margin-right: 20%;">Agregar</button>
+            <button type="button" class="btn btn-primary" id="buttonAddSocioNuevo" style="width: 60%; margin-left: 20%; margin-right: 20%;" >Agregar</button>
           </div>
           <div class="col-8" >
             <div id="selectApoderado">
