@@ -54,6 +54,13 @@ def get_estadisticas_paises():
                 continentes_estadisticas2[cont['name']] = cant
    
     continentes_estadisticas = sorted(continentes_estadisticas2.items(), key=lambda x: x[1], reverse=True)
+    
+    # Cut list to 3
+    paises_estadisticas = paises_estadisticas[:3]
+    continentes_estadisticas = continentes_estadisticas[:3]
+
+    
+    
     return render_template('estadisticas.html', paises_estadisticas=paises_estadisticas, continentes_estadisticas=continentes_estadisticas)
     # Get estadisticas de paises de la sociedades
 
@@ -63,19 +70,28 @@ def get_metricas():
     activitys= bonita.getAllActivity()
     # count cant in array json from getAllCasesFinalizados
     cant_finalizados= len(bonita.getAllCasesFinalizados())
-
+    
     # Analyze activitys and get metrics.
     # Count how much activitys have each type (from value displayName)
     metrics={}
     for activity in activitys:
         if activity['state'] == 'failed':
             cant_fallidos += 1
+            if cant_finalizados>0:
+                cant_finalizados -= 1
         else:
             cant_activos += 1
 
-        if activity['displayName'] in metrics:
-            metrics[activity['displayName']] += 1
-        else:
-            metrics[activity['displayName']] = 1
+            if activity['displayName'] in metrics:
+                metrics[activity['displayName']] += 1
+            else:
+                metrics[activity['displayName']] = 1
+    activitysArchived= bonita.getAllActivityFinalizados()
+    # Count cant in activitysArchived if state is aborted , and count 1 cant_fallido and rest 1 cant_finalizados
+    for activity in activitysArchived:
+        if activity['state'] == 'aborted':
+            cant_fallidos += 1
+            if cant_finalizados>0:
+                cant_finalizados -= 1
     
     return render_template('metricas.html',cantidad_procesos_activos=cant_activos,cantidad_procesos_fallidos=cant_fallidos, cantidad_procesos_finalizados=cant_finalizados,metrics=metrics.items())

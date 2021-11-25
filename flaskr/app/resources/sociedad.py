@@ -101,7 +101,8 @@ def nueva():
 
     
     sociedad = Sociedad(data["nombreSociedad"],data["fechaCreacion"],data["domicilioLegal"],data["domicilioReal"],data["email"],data["paisesExpo"],"Esperando Confirmacion")
-
+    if sociedad.paises == "":
+        sociedad.paises = "Argentina(SA)" 
     
     # print(dict(data["socios"]))
 
@@ -316,23 +317,17 @@ def login():
         return redirect(url_for("login_page"))
 
 def menu_mesaEntrada():
-    session["tipo_user"]=1
-    session["id_usuario"]=1
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
         return redirect(url_for("login_page"))
     return render_template("menu_mesa_de_entrada.html")
 
 def menu_legales():
-    session["tipo_user"]=2
-    session["id_usuario"]=1
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=2):
         return redirect(url_for("login_page"))
     return render_template("menu_area_de_legales.html")
 
 
 def menu_gerencia():
-    session["tipo_user"]=3
-    session["id_usuario"]=1
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=3):
         return redirect(url_for("login_page"))
     return render_template("menu_gerencia.html")
@@ -372,7 +367,7 @@ def rechazar_solicitud():
     socis.estado=1
     socis.save()
     activityId= bonita.searchActivityByCase(socis.caseId)
-
+    print("ActivityId : "+ str(activityId))
     bonita.setVariable(socis.caseId,"solicitudValido","false","java.lang.Boolean")
     bonita.setVariable(socis.caseId,"comentarios",data["comentario"],"java.lang.String")
 
@@ -400,7 +395,7 @@ def rechazar_estatuto():
     socis.save()
     activityId= bonita.searchActivityByCase(socis.caseId)
 
-    bonita.setVariable(socis.caseId,"solicitudValido","false","java.lang.Boolean")
+    bonita.setVariable(socis.caseId,"estatutoValido","false","java.lang.Boolean")
     bonita.setVariable(socis.caseId,"comentarios",data["comentario"],"java.lang.String")
 
     bonita.assignTask(activityId,session["id_usuario"])
@@ -414,7 +409,7 @@ def aceptar_estatuto():
     socis.estado=4
     socis.save()
     activityId= bonita.searchActivityByCase(socis.caseId)
-    bonita.setVariable(socis.caseId,"solicitudValido","true","java.lang.Boolean")
+    bonita.setVariable(socis.caseId,"estatutoValido","true","java.lang.Boolean")
     bonita.assignTask(activityId,session["id_usuario"])
     bonita.completeActivity(activityId)
     return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
@@ -433,9 +428,14 @@ def aceptar_estatuto():
 # redirect: true or false. false is the default value if the redirect parameter is not specified. It indicates that the service should not redirect to Bonita Applications (after a successful login) or to the login page (after a login failure).
 # redirectUrl: the URL of the page to be displayed after a succesful login. If it is specified, then the a redirection after the login will be performed even if the "redirect" parameter is not present in the request.
 # tenant: the tenant to log in to (optional for Enterprise and Performance editions, not supported for Community, Teamwork and Efficiency editions)
-def vista_sociedad(hash):
+def vista_sociedad():
+    # get hash from query param "hash"
+    print(request.full_path)
+    # parse request.full_path to get hash
+    hash = request.full_path.split("hash=")[-1]
+    
     ## BUSCAR POR SOCIEDAD TODO
-    soc= Sociedad.buscarSociedadPorId(hash)
+    soc= Sociedad.buscarSociedadPorHash(hash)
     if soc is None:
         flash("Sociedad no encontrada",category="error")
         return redirect(url_for("home"))

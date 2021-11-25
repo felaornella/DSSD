@@ -10,14 +10,14 @@ def generar_qr(id):
         return jsonify({'msg':'Sociedad no encontrada'}),404,{'ContentType':"application/json"}
     
     # Get qr from the api 
-    url = "localhost:5000/sociedad/"+soc.id  # Url de la sociedad que se va a mostrar
+    url = "localhost:5000/sociedad/"+str(soc.id)  # Url de la sociedad que se va a mostrar
     # Find if the qr exists in app/static/qr/ 
-    qr_path = Path("app/static/temp/qr/qr_"+soc.id+'.png')
+    qr_path = Path("app/static/temp/qr/qr_"+str(soc.id)+'.png')
     if not qr_path.exists():
         print("no existe se crea y se guarda en drive")
         img = qrcode.make(url)
-        img.save('app/static/temp/qr/qr_'+soc.id+'.png')
-        GD.subir_archivo("app/static/temp/qr/qr_"+soc.id+".png",GD.folder_qr)
+        img.save('app/static/temp/qr/qr_'+str(soc.id)+'.png')
+        GD.subir_archivo("app/static/temp/qr/qr_"+str(soc.id)+".png",GD.folder_qr)
     else:
         print("existe") 
         
@@ -26,13 +26,13 @@ def generar_qr(id):
 
 def obtener_qr(id):
     
-    qr_path = Path("app/static/temp/qr/qr_"+id+'.png')
+    qr_path = Path("app/static/temp/qr/qr_"+str(id)+'.png')
     if not qr_path.exists():
         print("no existe - lo busca en drive")
-        GD.bajar_acrchivo_por_nombre("qr_"+id+'.png',"app/static/temp/qr/")
+        GD.bajar_acrchivo_por_nombre("qr_"+str(id)+'.png',"app/static/temp/qr/")
         # Return error "file not found" 
         if not qr_path.exists():
             print("no existe ni en drive")
             return jsonify({'msg':'File not found'}),404,{'ContentType':"application/json"}
     
-    return send_file('static\\temp\\qr\\qr_'+id+'.png', mimetype='image/png')
+    return send_file('static\\temp\\qr\\qr_'+str(id)+'.png', mimetype='image/png')

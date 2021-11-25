@@ -50,5 +50,9 @@ class Sociedad(db.Model):
     # --- Desarrollo de Activar/Desactivar Turno_Final ---
 
     def buscarSociedadPorId(id):
-        turno = Sociedad.query.filter_by(id=id).first()
-        return turno
+        soc = Sociedad.query.filter_by(id=id).first()
+        return soc
+
+    def buscarSociedadPorHash(hash):
+        soc = Sociedad.query.filter_by(hash=hash).first()
+        return soc

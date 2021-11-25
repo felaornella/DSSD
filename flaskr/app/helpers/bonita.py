@@ -26,6 +26,7 @@ def getProcessId(nombreProceso):
 def setVariable(caseId,variable,valor,tipo):
     body= {"value":str(valor),"type":str(tipo)}
     res = requests.put("http://localhost:8080/bonita/API/bpm/caseVariable/"+str(caseId)+"/"+str(variable),json=body,headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+    print("Estado de set variable " + str(res.status_code))
 
 def initiateProcess(idProc):
     res = requests.post("http://localhost:8080/bonita/API/bpm/process/"+idProc+"/instantiation", headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
@@ -37,12 +38,15 @@ def searchActivityByCase(caseId):
     return res.json()[0]["id"]
 
 def assignTask(activityId,idUser):
-    body={"assigned_id": idUser }
+    body={"assigned_id": str(idUser) }
     res = requests.put("http://localhost:8080/bonita/API/bpm/userTask/"+str(activityId),json=body , headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
-    
+    # Print the status code of the response.
+    print("Estado de asignacion " + str(res.status_code))
+
 def completeActivity(activityId):
-    res = requests.post("http://localhost:8080/bonita/API/bpm/userTask/"+activityId+"/execution", headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
-    
+    res = requests.post("http://localhost:8080/bonita/API/bpm/userTask/"+str(activityId)+"/execution", headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
+    print("Estado de ejecucion " + str(res.status_code))
+
 def checkRole(role,idUser):
     r = requests.get("http://localhost:8080/bonita/API/identity/membership?f=user_id=" + idUser, headers={"X-Bonita-API-Token":session["X-Bonita-API-Token"],"Cookie":session["Cookies-bonita"]})
     tipo_user= r.json()
@@ -84,4 +88,18 @@ def getAllCasesFinalizados():
         return res.json()
     return []
     
+def getAllActivityFinalizados():
+    body = {'username':"gerencia", 'password':"gerencia", 'redirect':'false'}
+  
+    res = requests.post('http://localhost:8080/bonita/loginservice', data=body,headers={"Content-Type" : "application/x-www-form-urlencoded"})
+    if res.status_code==200:
+        tokenbonita= res.cookies.get('X-Bonita-API-Token')
+        cookiesbonita = "JSESSIONID="+res.cookies.get('JSESSIONID')+";X-Bonita-API-Token="+res.cookies.get('X-Bonita-API-Token')
+        
+        url = "http://localhost:8080/bonita/API/bpm/archivedActivity?o=reached_state_date desc"
 
+    
+        res= requests.get(url ,headers={"X-Bonita-API-Token":tokenbonita,"Cookie":cookiesbonita})
+        
+        return res.json()
+    return []

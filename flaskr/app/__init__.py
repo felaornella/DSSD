@@ -77,10 +77,10 @@ def create_app(environment="development"):
     app.add_url_rule("/aceptar_solicitud", "aceptar_solicitud", sociedad.aceptar_solicitud,methods=["POST"])
     app.add_url_rule("/rechazar_solicitud_estatuto", "rechazar_solicitud_estatuto", sociedad.rechazar_estatuto,methods=["POST"])
     app.add_url_rule("/aceptar_solicitud_estatuto", "aceptar_solicitud_estatuto", sociedad.aceptar_estatuto,methods=["POST"])
-    app.add_url_rule("/sociedad/<hash>", "vista_sociedad", sociedad.vista_sociedad,methods=["GET"])
+    app.add_url_rule("/sociedad", "vista_sociedad", sociedad.vista_sociedad,methods=["GET"])
     
     app.add_url_rule("/generar_qr/<id>", "generar_qr", qr.generar_qr,methods=["GET"])
-    app.add_url_rule("/qr/<hash>", "obtener_qr", qr.obtener_qr,methods=["GET"])
+    app.add_url_rule("/qr/<id>", "obtener_qr", qr.obtener_qr,methods=["GET"])
     app.add_url_rule("/estatutos/<id>", "obtener_estatuto", sociedad.obtener_estatuo,methods=["GET"])
     app.add_url_rule("/generar-carpeta-virtual/<id>", "generar_carpeta_virtual", sociedad.generar_carpeta_virtual,methods=["GET"])
     app.add_url_rule("/sociedad/pdf/<id>", "obtener_pdf_sociedad", sociedad.obtener_pdf_sociedad,methods=["GET"])
