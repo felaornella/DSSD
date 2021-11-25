@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+{% block title %}Sociedad anonima{% endblock %}
+{% block head %}
+  {{ super() }}
+  
+{% endblock %}
+{% block content %}
+<div class="container card" id="solicitudDiv{{sociedad.id}}">
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 0;">
+            <h2 class="card-header text-center" style="text-decoration: underline; font-size: 1.5rem;">{{sociedad.nombre}}</h2>
+        </div>
+        <hr style="height: 1px; background-color: rgba(163, 163, 163, 0.3); border: none; margin-top: 0; padding-top: none;">
+        <h3 style="color: rgba(0,0,0,0.8); text-decoration: underline;">Informacion de la Sociedad</h3>
+        <!-- div con col-6 with text center-->
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <p style="font-weight: bold;">Fecha Creacion</p>
+                <p class="ml-2 h6 text-muted" style="margin-left: 1rem;">{{sociedad.fechaCreacion.strftime("%d/%m/%Y")}}</p>
+            </div>
+            <div class="col-6">
+                <p style="font-weight: bold;">Correo Apoderado</p>
+                <p class="ml-2 h6 text-muted" style="margin-left: 1rem;">{{sociedad.correoApoderado}}</p>
+            </div>
+            <div class="col-6">
+                <p style="font-weight: bold;">Domicilio Legal</p>
+                <p class="ml-2 h6 text-muted" style="margin-left: 1rem;">{{sociedad.domicilioLegal}}</p>
+            </div>
+            <div class="col-6">
+                <p style="font-weight: bold;">Domicilio Real</p>
+                <p class="ml-2 h6 text-muted" style="margin-left: 1rem;">{{sociedad.domicilioReal}}</p>
+            </div>
+        </div>
+        
+
+        <div style="display: flex;">
+            <div style="width: 100%;">
+                <p style="font-weight: bold;">Paises a Exportar: </p>
+                <p class="ml-2 h6 text-muted" style="margin-left: 1rem;">{{sociedad.paises}}</p>
+            </div>
+        </div>
+
+        <hr style="height: 1px; background-color: rgba(163, 163, 163, 0.3); border: none; margin-left: 3rem; margin-right: 3rem;">
+
+        <div>
+            <div style="width: 100%;">
+                <div style="margin-bottom: .8rem;">
+                    <span style="color: rgba(0,0,0,0.8); text-decoration: underline; font-weight: bold; font-size: 1.1rem;">Listado de Socios</span> <small style="padding-left: 1rem;">(En celeste el socio apoderado)</small>
+                </div>
+                
+                <div class="container">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Apellido</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Porcentaje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {%for each in sociedad.socios%}
+                            {%if each.apoderado %}
+                                <tr class="table-primary">
+                                    <th>{{each.apellido}}</th>
+                                    <th>{{each.nombre}}</th>
+                                    <th>{{each.porcentaje}}%</th>
+                                </tr>
+                            {%else%}
+                                <tr>
+                                    <th>{{each.apellido}}</th>
+                                    <th>{{each.nombre}}</th>
+                                    <th>{{each.porcentaje}}%</th>
+                                </tr>
+                            {%endif%}
+                        {%endfor%}
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <hr style="height: 1px; background-color: rgba(163, 163, 163, 0.3); border: none; margin-left: 3rem; margin-right: 3rem;">
+        <h3 style="color: rgba(0,0,0,0.8); text-decoration: underline;">Recursos Online</h3>
+        <table style="margin-top: 1.5rem; border: none;">
+            <tr style="border: none;">
+                <th><img src="http://localhost:5000/qr/{{sociedad.id}}" class="img-fluid" style="max-width: 200px;" alt="QR de sociedad {{sociedad.id}}"></th>
+                <th style="border: none; padding-left: 20px; text-align: left;">
+                    <a href="{{ url_for('obtener_estatuto',id=sociedad.id)}}" role="button" class="btn btn-primary">Estatuto </a><br><br>
+                    <a href="{{ url_for('obtener_pdf_sociedad',id=sociedad.id)}}" role="button" class="btn btn-primary">PDF</a>
+                </th>
+                <th style="border: none;"></th>
+            </tr>
+        </table>
+        <div style="display: flex; margin-top: 1.5rem;">
+            <div style="border: 1px solid black; ">
+                
+            </div>
+            
+            
+        </div>
+    </div>    
+</div>
+{% endblock %}
+{% block scripts %}
+  <script src="{{url_for('static',filename='form_sociedad_anonima.js')}}"></script>
+{% endblock %}

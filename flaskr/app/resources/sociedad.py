@@ -450,7 +450,7 @@ def vista_sociedad():
         flash("Sociedad no encontrada",category="error")
         return redirect(url_for("home"))
 
-    return render_template("sociedad.html",sociedad=soc)
+    return render_template("sociedad_vista.html",sociedad=soc)
 def obtener_estatuo(id):
     soc= Sociedad.buscarSociedadPorId(id)
     if soc is None:
