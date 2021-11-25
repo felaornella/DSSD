@@ -79,6 +79,7 @@ def create_app(environment="development"):
     app.add_url_rule("/aceptar_solicitud_estatuto", "aceptar_solicitud_estatuto", sociedad.aceptar_estatuto,methods=["POST"])
     app.add_url_rule("/sociedad", "vista_sociedad", sociedad.vista_sociedad,methods=["GET"])
     
+
     app.add_url_rule("/generar_qr/<id>", "generar_qr", qr.generar_qr,methods=["GET"])
     app.add_url_rule("/qr/<id>", "obtener_qr", qr.obtener_qr,methods=["GET"])
     app.add_url_rule("/estatutos/<id>", "obtener_estatuto", sociedad.obtener_estatuo,methods=["GET"])
@@ -86,6 +87,9 @@ def create_app(environment="development"):
     app.add_url_rule("/sociedad/pdf/<id>", "obtener_pdf_sociedad", sociedad.obtener_pdf_sociedad,methods=["GET"])
     app.add_url_rule("/gerencia/estadisticas", "estadisticas", estadisticas.get_estadisticas_paises,methods=["GET"])
     app.add_url_rule("/gerencia/metricas", "metricas", estadisticas.get_metricas,methods=["GET"])
+
+    app.add_url_rule("/generar_carpetas_fisicas", "generar_carpetas_fisicas", sociedad.generar_carpetas_fisicas,methods=["GET"])
+    app.add_url_rule("/generar_carpeta_fisica", "generar_carpeta_fisica", sociedad.generar_carpeta_fisica,methods=["POST"])
     return app
 
 '''
