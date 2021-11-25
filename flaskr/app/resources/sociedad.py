@@ -345,12 +345,26 @@ def login():
 def menu_mesaEntrada():
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
         return redirect(url_for("login_page"))
-    return render_template("menu_mesa_de_entrada.html")
+    
+    sociedades= Sociedad.all()
+    cant_listos=0
+    cant_pendientes=0
+    for each in sociedades:
+        if each.estado==5:
+            cant_listos+=1
+        elif each.estado==0:
+            cant_pendientes+=1
+    return render_template("menu_mesa_de_entrada.html", cant_listos=cant_listos, cant_pendientes=cant_pendientes)
 
 def menu_legales():
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=2):
         return redirect(url_for("login_page"))
-    return render_template("menu_area_de_legales.html")
+    sociedades= Sociedad.all()
+    cant_pendientes=0
+    for each in sociedades:
+        if each.estado==2:
+            cant_pendientes+=1
+    return render_template("menu_area_de_legales.html", cant_pendientes=cant_pendientes)
 
 
 def menu_gerencia():
@@ -537,8 +551,8 @@ def generar_carpeta_virtual(id):
             dest=result)
     
     result.close()
-    
-
+    soc.estado= 5
+    soc.save()
     # Generar carpeta virtual (Subir a drive)
 
 # COMENTARIO TEMPORAL==============================
@@ -549,4 +563,27 @@ def generar_carpeta_virtual(id):
     # El pdf de la sociedad ya esta arriba en la nube 
     return jsonify({'msg':'Carpeta virtual creada'}),200,{'ContentType':"application/json"}
 
+def generar_carpetas_fisicas():
+    if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
+        return redirect(url_for("login_page"))
+    socis= Sociedad.all()
+    sociedades=[]
+    for each in socis:
+        if(each.estado==5):
+            soci={}
+            soci["sociedad"]=each
+            soci["paises"]=each.paises.split(",")
+            sociedades.append(soci)
+    return render_template("generar_carpetas_fisica.html",sociedades=sociedades)
 
+def generar_carpeta_fisica():
+    if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=1):
+        return redirect(url_for("login_page"))
+    data= request.get_json(force=True)
+    socis= Sociedad.buscarSociedadPorId(data["solicitudId"])
+    socis.estado=10
+    socis.save()
+    activityId= bonita.searchActivityByCase(socis.caseId)
+    bonita.assignTask(activityId,session["id_usuario"])
+    bonita.completeActivity(activityId)
+    return jsonify({'msg':'Creado'}),200,{'ContentType':"application/json"}
