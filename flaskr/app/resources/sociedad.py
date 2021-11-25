@@ -81,6 +81,9 @@ def guardarEdicion(hash):
     if (session["email_user"] != sociedad.correoApoderado):
         return jsonify({'msg':'No tenes acceso para editar esto'}),400,{'ContentType':"application/json"}
     #Buscar sociedad vieja y editarla
+    print(json.loads(data["socios"]).values())
+    if (json.loads(data["socios"]).values().__len__()==0):
+        return jsonify({'msg':'No se puede guardar una sociedad sin socios'}),400,{'ContentType':"application/json"}
     if (sociedad.estado==1):
         sociedad.nombre =data["nombreSociedad"]
         sociedad.fechaCreacion =data["fechaCreacion"]
@@ -89,7 +92,7 @@ def guardarEdicion(hash):
         sociedad.correoApoderado =data["email"]
         sociedad.paises =data["paisesExpo"]
         
-
+        
         #eliminar socios
         for socio in sociedad.socios:
             socio.delete()
