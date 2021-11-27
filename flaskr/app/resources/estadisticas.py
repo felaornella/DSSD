@@ -66,6 +66,8 @@ def get_estadisticas_paises():
     return render_template('estadisticas.html', paises_estadisticas=paises_estadisticas, continentes_estadisticas=continentes_estadisticas)
     # Get estadisticas de paises de la sociedades
 
+     
+
 def get_metricas():
     if (not "tipo_user" in session or not "id_usuario" in session or session["tipo_user"]!=3):
         return redirect(url_for("login_page"))

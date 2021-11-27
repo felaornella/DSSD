@@ -407,6 +407,7 @@ def generar_carpeta_virtual(id):
             dest=result)
     
     result.close()
+    GD.subir_archivo("app/static/temp/sociedades/sociedad_"+str(soc.id)+".pdf",GD.folder_sociedades)
     soc.estado= 5
     soc.save()
     

@@ -84,8 +84,8 @@
             <tr style="border: none;">
                 <th><img src="http://localhost:5000/qr/{{sociedad.id}}" class="img-fluid" alt="QR de sociedad {{sociedad.id}}"></th>
                 <th style="border: none; padding-left: 20px; text-align: left;">
-                    <a href="{{ url_for('obtener_estatuto',id=sociedad.id)}}" role="button" style="font-size: 1.5rem; font-weight: normal;">Estatuto </a><br><br>
-                    <a href="{{ url_for('obtener_pdf_sociedad',id=sociedad.id)}}" role="button" style="font-size: 1.5rem; font-weight: normal;">PDF</a>
+                    <a href="http://localhost:5000{{ url_for('obtener_estatuto',id=sociedad.id)}}"  style="font-size: 1.5rem; font-weight: normal;">Estatuto</a><br><br>
+                    
                 </th>
                 <th style="border: none;"></th>
             </tr>
