@@ -9,11 +9,7 @@
 
 - Version de bonita a importar: DSSD-71.0
 
--  Tener una base de datos MYSQL
-(El usuario y password estan en config.py, modificar el metodo DevelopmentConfig)
-
 - Ejecutar `python run.py` desde dentro de la carpeta flaskr
-
 
 
 ## Usuarios
